@@ -48,14 +48,14 @@
 			this.button3 = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.button4 = new System.Windows.Forms.Button();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.output_textBox = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.button5 = new System.Windows.Forms.Button();
 			this.button6 = new System.Windows.Forms.Button();
 			this.button7 = new System.Windows.Forms.Button();
 			this.label9 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
-			this.label11 = new System.Windows.Forms.Label();
+			this.cost_label = new System.Windows.Forms.Label();
+			this.method_label = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -307,15 +307,15 @@
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.label11);
+			this.groupBox2.Controls.Add(this.method_label);
 			this.groupBox2.Controls.Add(this.label12);
-			this.groupBox2.Controls.Add(this.label10);
+			this.groupBox2.Controls.Add(this.cost_label);
 			this.groupBox2.Controls.Add(this.label9);
 			this.groupBox2.Controls.Add(this.button7);
 			this.groupBox2.Controls.Add(this.button6);
 			this.groupBox2.Controls.Add(this.button5);
 			this.groupBox2.Controls.Add(this.label8);
-			this.groupBox2.Controls.Add(this.textBox1);
+			this.groupBox2.Controls.Add(this.output_textBox);
 			this.groupBox2.Controls.Add(this.button4);
 			this.groupBox2.Location = new System.Drawing.Point(215, 12);
 			this.groupBox2.Name = "groupBox2";
@@ -332,15 +332,16 @@
 			this.button4.TabIndex = 0;
 			this.button4.Text = "贪心算法";
 			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
-			// textBox1
+			// output_textBox
 			// 
-			this.textBox1.Location = new System.Drawing.Point(87, 29);
-			this.textBox1.Multiline = true;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBox1.Size = new System.Drawing.Size(406, 240);
-			this.textBox1.TabIndex = 1;
+			this.output_textBox.Location = new System.Drawing.Point(87, 29);
+			this.output_textBox.Multiline = true;
+			this.output_textBox.Name = "output_textBox";
+			this.output_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+			this.output_textBox.Size = new System.Drawing.Size(406, 240);
+			this.output_textBox.TabIndex = 1;
 			// 
 			// label8
 			// 
@@ -387,23 +388,23 @@
 			this.label9.TabIndex = 6;
 			this.label9.Text = "耗时：";
 			// 
-			// label10
+			// cost_label
 			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(6, 257);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(59, 12);
-			this.label10.TabIndex = 7;
-			this.label10.Text = "233.33 秒";
+			this.cost_label.AutoSize = true;
+			this.cost_label.Location = new System.Drawing.Point(6, 257);
+			this.cost_label.Name = "cost_label";
+			this.cost_label.Size = new System.Drawing.Size(59, 12);
+			this.cost_label.TabIndex = 7;
+			this.cost_label.Text = "233.33 秒";
 			// 
-			// label11
+			// method_label
 			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(6, 220);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(53, 12);
-			this.label11.TabIndex = 9;
-			this.label11.Text = "贪心算法";
+			this.method_label.AutoSize = true;
+			this.method_label.Location = new System.Drawing.Point(6, 220);
+			this.method_label.Name = "method_label";
+			this.method_label.Size = new System.Drawing.Size(53, 12);
+			this.method_label.TabIndex = 9;
+			this.method_label.Text = "贪心算法";
 			// 
 			// label12
 			// 
@@ -464,13 +465,13 @@
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.Button button4;
 		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox output_textBox;
 		private System.Windows.Forms.Button button7;
 		private System.Windows.Forms.Button button6;
 		private System.Windows.Forms.Button button5;
-		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Label cost_label;
 		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.Label method_label;
 		private System.Windows.Forms.Label label12;
 	}
 }

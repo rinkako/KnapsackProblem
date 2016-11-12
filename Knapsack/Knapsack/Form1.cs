@@ -100,12 +100,24 @@ namespace Knapsack
 			this.ProblemGen.Save(sForm.FileName);
 		}
 
-
-
-
-
-
-
-
+		/// <summary>
+		/// 按钮：贪心算法
+		/// </summary>
+		private void button4_Click(object sender, EventArgs e)
+		{
+			if (this.testProblemString == String.Empty)
+			{
+				MessageBox.Show("请先生成测试数据");
+				return;
+			}
+			double Cost;
+			Dictionary<string, string> Rets;
+			ISolver solver = new GreedySolver();
+			solver.Init(this.output_textBox, null);
+			solver.Solve(this.testProblemString);
+			solver.GetResult(out Cost, out Rets);
+			this.method_label.Text = "贪心算法";
+			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.00000000"));
+		}
 	}
 }
