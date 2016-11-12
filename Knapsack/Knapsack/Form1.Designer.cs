@@ -57,6 +57,7 @@
 			this.cost_label = new System.Windows.Forms.Label();
 			this.method_label = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
+			this.button8 = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -307,6 +308,7 @@
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.button8);
 			this.groupBox2.Controls.Add(this.method_label);
 			this.groupBox2.Controls.Add(this.label12);
 			this.groupBox2.Controls.Add(this.cost_label);
@@ -393,18 +395,18 @@
 			this.cost_label.AutoSize = true;
 			this.cost_label.Location = new System.Drawing.Point(6, 257);
 			this.cost_label.Name = "cost_label";
-			this.cost_label.Size = new System.Drawing.Size(59, 12);
+			this.cost_label.Size = new System.Drawing.Size(29, 12);
 			this.cost_label.TabIndex = 7;
-			this.cost_label.Text = "233.33 秒";
+			this.cost_label.Text = "——";
 			// 
 			// method_label
 			// 
 			this.method_label.AutoSize = true;
 			this.method_label.Location = new System.Drawing.Point(6, 220);
 			this.method_label.Name = "method_label";
-			this.method_label.Size = new System.Drawing.Size(53, 12);
+			this.method_label.Size = new System.Drawing.Size(29, 12);
 			this.method_label.TabIndex = 9;
-			this.method_label.Text = "贪心算法";
+			this.method_label.Text = "——";
 			// 
 			// label12
 			// 
@@ -414,6 +416,16 @@
 			this.label12.Size = new System.Drawing.Size(41, 12);
 			this.label12.TabIndex = 8;
 			this.label12.Text = "方法：";
+			// 
+			// button8
+			// 
+			this.button8.Location = new System.Drawing.Point(6, 176);
+			this.button8.Name = "button8";
+			this.button8.Size = new System.Drawing.Size(75, 23);
+			this.button8.TabIndex = 10;
+			this.button8.Text = "导入测试";
+			this.button8.UseVisualStyleBackColor = true;
+			this.button8.Click += new System.EventHandler(this.button8_Click);
 			// 
 			// Form1
 			// 
@@ -473,6 +485,7 @@
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label method_label;
 		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Button button8;
 	}
 }
 

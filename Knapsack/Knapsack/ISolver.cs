@@ -30,5 +30,11 @@ namespace Knapsack
 		/// <param name="costTime">[out]消耗的时间</param>
 		/// <param name="returnDict">[out]返回值的字典</param>
 		void GetResult(out double costTime, out Dictionary<string, string> returnDict);
+
+		/// <summary>
+		/// 获取问题解决耗时
+		/// </summary>
+		/// <param name="costTime">[out]消耗的时间</param>
+		void GetCost(out double costTime);
 	}
 }

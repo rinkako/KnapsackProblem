@@ -61,9 +61,9 @@ namespace Knapsack
 				for (int i = 0; i < this.Items.Count; i++)
 				{
 					if (this.Items[i].Item5 != true &&
-						(currentWeight + this.Items[i].Item3 <= this.Capacity))
+						(currentWeight + this.Items[i].Item2 <= this.Capacity))
 					{
-						currentWeight += this.Items[i].Item3;
+						currentWeight += this.Items[i].Item2;
 						// 标记脏位
 						this.Items[i] = new Tuple<int, int, int, double, bool>(
 							this.Items[i].Item1,
@@ -77,7 +77,7 @@ namespace Knapsack
 						this.PickList.Add(i);
                     }
 				}
-			} while (pickFlag == false);
+			} while (pickFlag != false);
 			this.FinalWeight = currentWeight;
 			// 算法结束
 			this.EndTimeStamp = DateTime.Now;
@@ -100,20 +100,33 @@ namespace Knapsack
 			Dictionary<string, string> retDict = new Dictionary<string, string>();
 			// 选中的项目
 			StringBuilder sb = new StringBuilder();
+			double sumValue = 0;
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[i];
 				var outStr = String.Format("[{0}]\tWeight:{1}\tValue:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
                 sb.AppendLine(outStr);
 				this.UIReference.Text += outStr + Environment.NewLine;
+				sumValue += aItem.Item3;
             }
 			retDict.Add("Output", sb.ToString());
 			// 装入总重量
-			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.00");
+			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
 			retDict.Add("LoadRate", loadRate);
-            this.UIReference.Text += String.Format("Total:{0}  Load-Rate:{1}", this.FinalWeight, loadRate) + Environment.NewLine;
+			retDict.Add("TotalValue", loadRate);
+			this.UIReference.Text += String.Format("Knapsack Capacity:{0}", this.Capacity) + Environment.NewLine;
+			this.UIReference.Text += String.Format("TotalV:{0} TotalW:{1} Load-Rate:{2}%", sumValue.ToString("0"), this.FinalWeight, loadRate) + Environment.NewLine;
 			returnDict = retDict;
         }
+
+		/// <summary>
+		/// 获取问题解决耗时
+		/// </summary>
+		/// <param name="costTime">[out]消耗的时间</param>
+		public void GetCost(out double costTime)
+		{
+			costTime = (this.EndTimeStamp - this.BeginTimeStamp).TotalMilliseconds;
+		}
 
 		/// <summary>
 		/// 物品列表（编号，质量，价值，单位价值，脏位）

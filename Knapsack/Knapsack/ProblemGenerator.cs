@@ -31,7 +31,7 @@ namespace Knapsack
 			{
 				this.Items.Add(new KeyValuePair<int, int>(rd.Next(iMin, iMax), rd.Next(vMin, vMax)));
 			}
-			int WeightSum = 0;
+			double WeightSum = 0;
 			this.Items.ForEach((x) => WeightSum += x.Key);
 			this.PackageCapacity = (int)Math.Round(WeightSum * this.Ratio);
 			// 生成输出字符串

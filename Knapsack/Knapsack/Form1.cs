@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -115,9 +116,34 @@ namespace Knapsack
 			ISolver solver = new GreedySolver();
 			solver.Init(this.output_textBox, null);
 			solver.Solve(this.testProblemString);
-			solver.GetResult(out Cost, out Rets);
 			this.method_label.Text = "贪心算法";
-			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.00000000"));
+			var dr = MessageBox.Show("计算完毕，是否显示结果？（这可能消耗一定的时间）", "信息", MessageBoxButtons.YesNo);
+			if (dr == DialogResult.Yes)
+			{
+				solver.GetResult(out Cost, out Rets);
+			}
+			else
+			{
+				solver.GetCost(out Cost);
+			}
+			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.0000000"));
+		}
+
+		/// <summary>
+		/// 按钮：导入测试
+		/// </summary>
+		private void button8_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "txt|*.txt";
+			DialogResult dr = ofd.ShowDialog();
+			if (dr == DialogResult.Cancel || ofd.FileName == "") { return; }
+			FileStream fs = new FileStream(ofd.FileName, FileMode.Open);
+			StreamReader sr = new StreamReader(fs);
+			this.testProblemString = sr.ReadToEnd();
+			this.testStringDescriptor = "0 0 0 0 0 0 0";
+			sr.Close();
+			fs.Close();
 		}
 	}
 }
