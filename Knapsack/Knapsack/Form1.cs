@@ -68,6 +68,36 @@ namespace Knapsack
 		#endregion
 		
 		/// <summary>
+		/// 问题解决收尾处理
+		/// </summary>
+		/// <param name="solver">解决器</param>
+		/// <param name="Rets">返回列表</param>
+		private void PostSolve(ISolver solver, ref Dictionary<string, string> Rets)
+		{
+			double Cost;
+			var dr = MessageBox.Show("计算完毕，是否直接保存结果到TXT文件？" + Environment.NewLine 
+				+ "（选择否将直接输出到UI，这将消耗一定的时间）", "信息", MessageBoxButtons.YesNo);
+			if (dr == DialogResult.Yes)
+			{
+				solver.GetCost(out Cost);
+				SaveFileDialog sfd = new SaveFileDialog();
+				sfd.Filter = "txt|*.txt";
+				DialogResult drr = sfd.ShowDialog();
+				if (drr == DialogResult.Cancel || sfd.FileName == "")
+				{
+					MessageBox.Show("请指定合法的文件名！");
+					return;
+				}
+				solver.GetResultFile(sfd.FileName);
+			}
+			else
+			{
+				solver.GetResult(out Cost, out Rets);
+			}
+			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.0000000"));
+		}
+
+		/// <summary>
 		/// 按钮：生成
 		/// </summary>
 		private void button1_Click(object sender, EventArgs e)
@@ -111,22 +141,12 @@ namespace Knapsack
 				MessageBox.Show("请先生成测试数据");
 				return;
 			}
-			double Cost;
-			Dictionary<string, string> Rets;
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
 			ISolver solver = new GreedySolver();
 			solver.Init(this.output_textBox, null);
 			solver.Solve(this.testProblemString);
 			this.method_label.Text = "贪心算法";
-			var dr = MessageBox.Show("计算完毕，是否显示结果？（这可能消耗一定的时间）", "信息", MessageBoxButtons.YesNo);
-			if (dr == DialogResult.Yes)
-			{
-				solver.GetResult(out Cost, out Rets);
-			}
-			else
-			{
-				solver.GetCost(out Cost);
-			}
-			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.0000000"));
+			this.PostSolve(solver, ref Rets);
 		}
 
 		/// <summary>

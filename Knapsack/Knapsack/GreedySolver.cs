@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -113,11 +114,46 @@ namespace Knapsack
 			// 装入总重量
 			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
 			retDict.Add("LoadRate", loadRate);
-			retDict.Add("TotalValue", loadRate);
+			retDict.Add("TotalValue", sumValue.ToString("0"));
+			retDict.Add("TotalWeight", this.FinalWeight.ToString());
 			this.UIReference.Text += String.Format("Knapsack Capacity:{0}", this.Capacity) + Environment.NewLine;
 			this.UIReference.Text += String.Format("TotalV:{0} TotalW:{1} Load-Rate:{2}%", sumValue.ToString("0"), this.FinalWeight, loadRate) + Environment.NewLine;
 			returnDict = retDict;
         }
+
+
+		/// <summary>
+		/// 获取问题解决的结果并写入文件
+		/// </summary>
+		/// <param name="filename">要写的文件路径</param>
+		public void GetResultFile(string filename)
+		{
+			if (this.UIReference == null)
+			{
+				throw new Exception("问题解决器尚未初始化就被使用");
+			}
+			// 选中的项目
+			StringBuilder sb = new StringBuilder();
+			double sumValue = 0;
+			for (int i = 0; i < this.PickList.Count; i++)
+			{
+				var aItem = this.Items[i];
+				var outStr = String.Format("[{0}]\tWeight:{1}\tValue:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				sb.AppendLine(outStr);
+				sumValue += aItem.Item3;
+			}
+			// 装入总重量
+			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
+			// 写文件
+			FileStream fs = new FileStream(filename, FileMode.Create);
+			StreamWriter sw = new StreamWriter(fs);
+			sw.WriteLine(sb.ToString());
+			sw.WriteLine("LoadRate: " + loadRate + "%");
+			sw.WriteLine("TotalWeight: " + this.FinalWeight.ToString() + "/" + this.Capacity.ToString());
+			sw.WriteLine("TotalValue: " + sumValue.ToString("0"));
+			sw.Close();
+			fs.Close();
+		}
 
 		/// <summary>
 		/// 获取问题解决耗时
@@ -136,7 +172,7 @@ namespace Knapsack
 		/// <summary>
 		/// 背包容量
 		/// </summary>
-		private int Capacity = 0;
+		private long Capacity = 0;
 
 		/// <summary>
 		/// 物品项目数
@@ -151,7 +187,7 @@ namespace Knapsack
 		/// <summary>
 		/// 最终装入背包的重量
 		/// </summary>
-		private int FinalWeight = 0;
+		private long FinalWeight = 0;
 
 		/// <summary>
 		/// 用户输入的测试数据

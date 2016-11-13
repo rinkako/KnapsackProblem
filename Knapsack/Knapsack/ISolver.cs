@@ -32,6 +32,12 @@ namespace Knapsack
 		void GetResult(out double costTime, out Dictionary<string, string> returnDict);
 
 		/// <summary>
+		/// 获取问题解决的结果并写入文件
+		/// </summary>
+		/// <param name="filename">要写的文件路径</param>
+		void GetResultFile(string filename);
+
+		/// <summary>
 		/// 获取问题解决耗时
 		/// </summary>
 		/// <param name="costTime">[out]消耗的时间</param>
