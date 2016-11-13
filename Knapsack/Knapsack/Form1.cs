@@ -94,7 +94,7 @@ namespace Knapsack
 			{
 				solver.GetResult(out Cost, out Rets);
 			}
-			this.cost_label.Text = String.Format("{0}秒", Cost.ToString("0.0000000"));
+			this.cost_label.Text = String.Format("{0} ms", Cost.ToString("0.000000"));
 		}
 
 		/// <summary>

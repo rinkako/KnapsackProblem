@@ -105,7 +105,7 @@ namespace Knapsack
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[i];
-				var outStr = String.Format("[{0}]\tWeight:{1}\tValue:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				var outStr = String.Format("[{0}]\tW:{1}\tV:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
                 sb.AppendLine(outStr);
 				this.UIReference.Text += outStr + Environment.NewLine;
 				sumValue += aItem.Item3;
@@ -138,7 +138,7 @@ namespace Knapsack
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[i];
-				var outStr = String.Format("[{0}]\tWeight:{1}\tValue:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				var outStr = String.Format("[{0}]\tW:{1}\tV:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
 				sb.AppendLine(outStr);
 				sumValue += aItem.Item3;
 			}
