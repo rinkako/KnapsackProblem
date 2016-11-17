@@ -89,6 +89,7 @@ namespace Knapsack
 					return;
 				}
 				solver.GetResultFile(sfd.FileName);
+				MessageBox.Show("保存完毕");
 			}
 			else
 			{

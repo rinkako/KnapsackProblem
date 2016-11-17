@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Windows.Forms;
 using System.Text;
 
@@ -97,8 +97,60 @@ namespace Knapsack
         /// <param name="filename">要写的文件路径</param>
         public override void GetResultFile(string filename)
         {
-            throw new NotImplementedException();
-        }
+			if (this.UIReference == null)
+			{
+				throw new Exception("问题解决器尚未初始化就被使用");
+			}
+			// 选中的项目
+			StringBuilder sb = new StringBuilder();
+			double sumValue = 0;
+			sb.AppendLine("ID\tW\tV");
+			for (int i = 0; i < this.PickList.Count; i++)
+			{
+				var aItem = this.PickList[i];
+				var outStr = String.Format("[{0}]\t{1}\t{2}", aItem.Id, aItem.Weight, aItem.Value);
+				sb.AppendLine(outStr);
+				sumValue += aItem.Value;
+			}
+			// 装入总重量
+			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
+			// 写文件
+			FileStream fs = new FileStream(filename, FileMode.Create);
+			StreamWriter sw = new StreamWriter(fs);
+			sw.WriteLine(sb.ToString());
+			sw.WriteLine("LoadRate: " + loadRate + "%");
+			sw.WriteLine("TotalWeight: " + this.FinalWeight.ToString() + "/" + this.Capacity.ToString());
+			sw.WriteLine("TotalValue: " + sumValue.ToString("0"));
+			sw.Close();
+			fs.Close();
+			// 写DP表的CSV
+			string csvFileName = filename.Replace(".txt", ".csv");
+			FileStream csvfs = new FileStream(csvFileName, FileMode.Create);
+			StreamWriter csvsw = new StreamWriter(csvfs);
+			// 表头
+			csvsw.Write("Item\\Cap");
+			for (int i = 0; i <= this.Capacity; i++)
+			{
+				csvsw.Write(',');
+				csvsw.Write("<" + i.ToString() + ">");
+			}
+			csvsw.Write(Environment.NewLine);
+			// 表体
+			for (int i = 0; i < this.ItemTypeCount; i++)
+			{
+				// 行头
+				csvsw.Write("[" + i.ToString() + "]");
+				// 行体
+                for (int j = 0; j <= this.Capacity; j++)
+				{
+					csvsw.Write(',');
+					csvsw.Write(this.DPTable[i, j]);
+				}
+				csvsw.Write(Environment.NewLine);
+			}
+			csvsw.Close();
+			csvfs.Close();
+		}
 
         /// <summary>
         /// 获取问题解决耗时
@@ -112,38 +164,38 @@ namespace Knapsack
         /// <summary>
         /// 执行具体的动态规划算法
         /// </summary>
-        /// <returns>物品的Pick项链</returns>
+        /// <returns>物品的Pick向量</returns>
         private List<PackageItem> DynamicPlanning()
         {
-            var DPTable = new int[this.ItemTypeCount, this.Capacity + 1];
+            this.DPTable = new int[this.ItemTypeCount, this.Capacity + 1];
             for (var j = 0; j <= this.Capacity; j++)
             {
                 for (int i = this.ItemTypeCount - 1; i >= 0; i--)
                 {
                     if (j == 0)
                     {
-                        DPTable[j, i] = 0;
+						this.DPTable[j, i] = 0;
                     }
                     else if (i == this.ItemTypeCount - 1)
                     {
                         if (Items[i].Weight > j)
                         {
-                            DPTable[i, j] = 0;
+							this.DPTable[i, j] = 0;
                         }
                         else
                         {
-                            DPTable[i, j] = Items[i].Value;
+							this.DPTable[i, j] = Items[i].Value;
                         }
                     }
                     else if (Items[i].Weight > j)
                     {
-                        DPTable[i, j] = DPTable[i + 1, j];
+						this.DPTable[i, j] = this.DPTable[i + 1, j];
                     }
                     else if (Items[i].Weight <= j)
                     {
-                        var dpEqItem1 = DPTable[i + 1, j];
-                        var dpEqItem2 = DPTable[i + 1, j - Items[i].Weight] + Items[i].Value;
-                        DPTable[i, j] = Math.Max(dpEqItem1, dpEqItem2);
+                        var dpEqItem1 = this.DPTable[i + 1, j];
+                        var dpEqItem2 = this.DPTable[i + 1, j - Items[i].Weight] + Items[i].Value;
+						this.DPTable[i, j] = Math.Max(dpEqItem1, dpEqItem2);
                     }
                 }
             }
@@ -168,7 +220,7 @@ namespace Knapsack
 						break;
 					}
 				}
-                else if (DPTable[i, leftSpace] != DPTable[i + 1, leftSpace])
+                else if (this.DPTable[i, leftSpace] != this.DPTable[i + 1, leftSpace])
                 {
                     retList.Add(itemObj);
                     leftSpace -= itemObj.Weight;
@@ -189,10 +241,15 @@ namespace Knapsack
         /// </summary>
         private List<PackageItem> PickList;
 
-        /// <summary>
-        /// 物品项类
-        /// </summary>
-        private class PackageItem
+		/// <summary>
+		/// 动态规划表
+		/// </summary>
+		public int[,] DPTable;
+
+		/// <summary>
+		/// 物品项类
+		/// </summary>
+		private class PackageItem
         {
             /// <summary>
             /// 物品标识符
@@ -208,7 +265,7 @@ namespace Knapsack
             /// 价值
             /// </summary>
             public int Value { get; set; }
-
+			
             /// <summary>
             /// 构造器
             /// </summary>
@@ -221,7 +278,16 @@ namespace Knapsack
                 this.Value = value;
                 this.Weight = weight;
             }
-        }
+
+			/// <summary>
+			/// 重写字符串化方法
+			/// </summary>
+			/// <returns>该物体的描述字符串</returns>
+			public override string ToString()
+			{
+				return String.Format("Item[{0}] W:{1} V:{2}", this.Id, this.Weight, this.Value);
+			}
+		}
 
     }
 }

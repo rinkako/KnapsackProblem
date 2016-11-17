@@ -140,10 +140,10 @@ namespace Knapsack
 			// 选中的项目
 			StringBuilder sb = new StringBuilder();
 			double sumValue = 0;
+			sb.AppendLine("ID\tW\tV\tW/V");
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
-				var aItem = this.Items[i];
-				sb.AppendLine("ID\tW\tV\tW/V");
+				var aItem = this.Items[this.PickList[i]];
 				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
 				sb.AppendLine(outStr);
 				sumValue += aItem.Item3;
