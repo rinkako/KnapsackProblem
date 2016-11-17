@@ -162,7 +162,7 @@ namespace Knapsack
 			FileStream fs = new FileStream(ofd.FileName, FileMode.Open);
 			StreamReader sr = new StreamReader(fs);
 			this.testProblemString = sr.ReadToEnd();
-			this.testStringDescriptor = "0 0 0 0 0 0 0";
+			this.testStringDescriptor = "- - - - - - -";
 			sr.Close();
 			fs.Close();
 		}
@@ -184,5 +184,23 @@ namespace Knapsack
             this.method_label.Text = "动态规划";
             this.PostSolve(solver, ref Rets);
         }
+
+		/// <summary>
+		/// 按钮：分支界限
+		/// </summary>
+		private void button6_Click(object sender, EventArgs e)
+		{
+			if (this.testProblemString == String.Empty)
+			{
+				MessageBox.Show("请先生成测试数据");
+				return;
+			}
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
+			Solver solver = new BranchBoundSolver();
+			solver.Init(this.output_textBox);
+			solver.Solve(this.testProblemString);
+			this.method_label.Text = "分支界限";
+			this.PostSolve(solver, ref Rets);
+		}
 	}
 }

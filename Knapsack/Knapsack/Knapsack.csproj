@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BranchBoundSolver.cs" />
     <Compile Include="DynamicPlanSolver.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -49,7 +50,8 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GreedySolver.cs" />
-    <Compile Include="ISolver.cs" />
+    <Compile Include="PackageItem.cs" />
+    <Compile Include="Solver.cs" />
     <Compile Include="PreviewForm.cs">
       <SubType>Form</SubType>
     </Compile>

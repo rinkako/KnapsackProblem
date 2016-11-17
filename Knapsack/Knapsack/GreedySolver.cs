@@ -39,20 +39,20 @@ namespace Knapsack
 			this.Capacity = Convert.ToInt32(lineitem[0]);
 			// 读取背包大小和物品种类数
 			this.ItemTypeCount = Convert.ToInt32(lineitem[1]);
-			this.Items = new List<Tuple<int, int, int, double, bool>>();
+			this.Items = new List<PackageItem>();
 			// 读取每种物品的属性
 			for (int i = 2; i < lineitem.Length; i++)
 			{
 				var aLine = lineitem[i].Split('\t');
 				var aW = Convert.ToInt32(aLine[1]);
 				var aV = Convert.ToInt32(aLine[2]);
-                this.Items.Add(new Tuple<int, int, int, double, bool>(i - 2, aW, aV, ((double)aV / (double)aW), false));
+                this.Items.Add(new PackageItem((i - 2).ToString(), aW, aV));
 			}
 			// 对单位价值做排序
 			this.Items.Sort((x, y) =>
 			{
-				if (x.Item4 > y.Item4) { return -1; }
-				else if (x.Item4 < y.Item4) { return 1; }
+				if (x.UnitValue > y.UnitValue) { return -1; }
+				else if (x.UnitValue < y.UnitValue) { return 1; }
 				else { return 0; }
 			});
 			// 解决问题，每步取能放入背包的最大价值物
@@ -64,17 +64,12 @@ namespace Knapsack
 				pickFlag = false;
 				for (int i = 0; i < this.Items.Count; i++)
 				{
-					if (this.Items[i].Item5 != true &&
-						(currentWeight + this.Items[i].Item2 <= this.Capacity))
+					if (this.Items[i].Dirty != true &&
+						(currentWeight + this.Items[i].Weight <= this.Capacity))
 					{
-						currentWeight += this.Items[i].Item2;
+						currentWeight += this.Items[i].Weight;
 						// 标记脏位
-						this.Items[i] = new Tuple<int, int, int, double, bool>(
-							this.Items[i].Item1,
-							this.Items[i].Item2,
-							this.Items[i].Item3,
-							this.Items[i].Item4,
-							true);
+						this.Items[i].Dirty = true;
 						// 标记本轮有pick
 						pickFlag = true;
 						// 记录pick的项目
@@ -109,10 +104,10 @@ namespace Knapsack
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[this.PickList[i]];
-				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Id, aItem.Weight, aItem.Value, aItem.UnitValue.ToString("0.000"));
                 sb.AppendLine(outStr);
 				this.UIReference.Text += outStr + Environment.NewLine;
-				sumValue += aItem.Item3;
+				sumValue += aItem.Value;
             }
 			retDict.Add("Output", sb.ToString());
 			// 装入总重量
@@ -125,8 +120,7 @@ namespace Knapsack
 			this.UIReference.Text += String.Format("TotalV:{0}", sumValue.ToString("0")) + Environment.NewLine;
 			returnDict = retDict;
         }
-
-
+		
 		/// <summary>
 		/// 获取问题解决的结果并写入文件
 		/// </summary>
@@ -144,9 +138,9 @@ namespace Knapsack
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[this.PickList[i]];
-				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Id, aItem.Weight, aItem.Value, aItem.UnitValue.ToString("0.000"));
 				sb.AppendLine(outStr);
-				sumValue += aItem.Item3;
+				sumValue += aItem.Value;
 			}
 			// 装入总重量
 			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
@@ -171,13 +165,13 @@ namespace Knapsack
 		}
 
 		/// <summary>
-		/// 物品列表（编号，质量，价值，单位价值，脏位）
+		/// 物品列表
 		/// </summary>
-		private List<Tuple<int, int, int, double, bool>> Items;
+		private List<PackageItem> Items;
 
-        /// <summary>
-        /// 选中的物品
-        /// </summary>
-        protected List<int> PickList;
+		/// <summary>
+		/// 选中的物品
+		/// </summary>
+		private List<int> PickList;
 	}
 }
