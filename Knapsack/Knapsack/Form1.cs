@@ -72,7 +72,7 @@ namespace Knapsack
 		/// </summary>
 		/// <param name="solver">解决器</param>
 		/// <param name="Rets">返回列表</param>
-		private void PostSolve(ISolver solver, ref Dictionary<string, string> Rets)
+		private void PostSolve(Solver solver, ref Dictionary<string, string> Rets)
 		{
 			double Cost;
 			var dr = MessageBox.Show("计算完毕，是否直接保存结果到TXT文件？" + Environment.NewLine 
@@ -142,8 +142,8 @@ namespace Knapsack
 				return;
 			}
 			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			ISolver solver = new GreedySolver();
-			solver.Init(this.output_textBox, null);
+			Solver solver = new GreedySolver();
+			solver.Init(this.output_textBox);
 			solver.Solve(this.testProblemString);
 			this.method_label.Text = "贪心算法";
 			this.PostSolve(solver, ref Rets);
@@ -165,5 +165,23 @@ namespace Knapsack
 			sr.Close();
 			fs.Close();
 		}
+
+        /// <summary>
+        /// 按钮：动态规划
+        /// </summary>
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (this.testProblemString == String.Empty)
+            {
+                MessageBox.Show("请先生成测试数据");
+                return;
+            }
+            Dictionary<string, string> Rets = new Dictionary<string, string>();
+            Solver solver = new DynamicPlanSolver();
+            solver.Init(this.output_textBox);
+            solver.Solve(this.testProblemString);
+            this.method_label.Text = "动态规划";
+            this.PostSolve(solver, ref Rets);
+        }
 	}
 }

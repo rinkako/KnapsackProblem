@@ -6,14 +6,17 @@ using System.Windows.Forms;
 
 namespace Knapsack
 {
-	class GreedySolver : ISolver
+    /// <summary>
+    /// 贪心算法的问题解决器
+    /// </summary>
+	class GreedySolver : Solver
 	{
 		/// <summary>
 		/// 初始化问题解决器
 		/// </summary>
 		/// <param name="console">输出的UI引用</param>
 		/// <param name="paras">参数向量</param>
-		public void Init(TextBox console, params string[] paras)
+		public override void Init(TextBox console, params string[] paras)
 		{
 			this.UIReference = console;
 		}
@@ -22,7 +25,7 @@ namespace Knapsack
 		/// 开始解决问题
 		/// </summary>
 		/// <param name="testdata">要解决的问题的描述字符串</param>
-		public void Solve(string testdata)
+        public override void Solve(string testdata)
 		{
 			if (this.UIReference == null)
 			{
@@ -89,7 +92,7 @@ namespace Knapsack
 		/// </summary>
 		/// <param name="costTime">[out]消耗的时间</param>
 		/// <param name="returnDict">[out]返回值的字典</param>
-		public void GetResult(out double costTime, out Dictionary<string, string> returnDict)
+        public override void GetResult(out double costTime, out Dictionary<string, string> returnDict)
 		{
 			if (this.UIReference == null)
 			{
@@ -126,7 +129,7 @@ namespace Knapsack
 		/// 获取问题解决的结果并写入文件
 		/// </summary>
 		/// <param name="filename">要写的文件路径</param>
-		public void GetResultFile(string filename)
+        public override void GetResultFile(string filename)
 		{
 			if (this.UIReference == null)
 			{
@@ -159,7 +162,7 @@ namespace Knapsack
 		/// 获取问题解决耗时
 		/// </summary>
 		/// <param name="costTime">[out]消耗的时间</param>
-		public void GetCost(out double costTime)
+        public override void GetCost(out double costTime)
 		{
 			costTime = (this.EndTimeStamp - this.BeginTimeStamp).TotalMilliseconds;
 		}
@@ -169,44 +172,9 @@ namespace Knapsack
 		/// </summary>
 		private List<Tuple<int, int, int, double, bool>> Items;
 
-		/// <summary>
-		/// 背包容量
-		/// </summary>
-		private long Capacity = 0;
-
-		/// <summary>
-		/// 物品项目数
-		/// </summary>
-		private int ItemTypeCount = 0;
-
-		/// <summary>
-		/// 选中的物品
-		/// </summary>
-		private List<int> PickList;
-
-		/// <summary>
-		/// 最终装入背包的重量
-		/// </summary>
-		private long FinalWeight = 0;
-
-		/// <summary>
-		/// 用户输入的测试数据
-		/// </summary>
-		private string testData = String.Empty;
-
-		/// <summary>
-		/// 输出UI的引用
-		/// </summary>
-		private TextBox UIReference = null;
-
-		/// <summary>
-		/// 运算开始时间戳
-		/// </summary>
-		private DateTime BeginTimeStamp;
-
-		/// <summary>
-		/// 运算结束时间戳
-		/// </summary>
-		private DateTime EndTimeStamp;
+        /// <summary>
+        /// 选中的物品
+        /// </summary>
+        protected List<int> PickList;
 	}
 }
