@@ -105,10 +105,11 @@ namespace Knapsack
 			// 选中的项目
 			StringBuilder sb = new StringBuilder();
 			double sumValue = 0;
+			this.UIReference.Text += "ID\tW\tV\tW/V" + Environment.NewLine;
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
-				var aItem = this.Items[i];
-				var outStr = String.Format("[{0}]\tW:{1}\tV:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				var aItem = this.Items[this.PickList[i]];
+				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
                 sb.AppendLine(outStr);
 				this.UIReference.Text += outStr + Environment.NewLine;
 				sumValue += aItem.Item3;
@@ -120,7 +121,8 @@ namespace Knapsack
 			retDict.Add("TotalValue", sumValue.ToString("0"));
 			retDict.Add("TotalWeight", this.FinalWeight.ToString());
 			this.UIReference.Text += String.Format("Knapsack Capacity:{0}", this.Capacity) + Environment.NewLine;
-			this.UIReference.Text += String.Format("TotalV:{0} TotalW:{1} Load-Rate:{2}%", sumValue.ToString("0"), this.FinalWeight, loadRate) + Environment.NewLine;
+			this.UIReference.Text += String.Format("TotalW:{0} Load-Rate:{1}%", this.FinalWeight, loadRate) + Environment.NewLine;
+			this.UIReference.Text += String.Format("TotalV:{0}", sumValue.ToString("0")) + Environment.NewLine;
 			returnDict = retDict;
         }
 
@@ -141,7 +143,8 @@ namespace Knapsack
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
 				var aItem = this.Items[i];
-				var outStr = String.Format("[{0}]\tW:{1}\tV:{2}\tW/V:{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
+				sb.AppendLine("ID\tW\tV\tW/V");
+				var outStr = String.Format("[{0}]\t{1}\t{2}\t{3}", aItem.Item1, aItem.Item2, aItem.Item3, aItem.Item4.ToString("0.000"));
 				sb.AppendLine(outStr);
 				sumValue += aItem.Item3;
 			}

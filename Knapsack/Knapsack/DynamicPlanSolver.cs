@@ -70,10 +70,11 @@ namespace Knapsack
             // 选中的项目
             StringBuilder sb = new StringBuilder();
             double sumValue = 0;
-            for (int i = 0; i < this.PickList.Count; i++)
+			this.UIReference.Text += "ID\tW\tV" + Environment.NewLine;
+			for (int i = 0; i < this.PickList.Count; i++)
             {
-                var aItem = this.Items[i];
-                var outStr = String.Format("[{0}]\tW:{1}\tV:{2}", aItem.Id, aItem.Weight, aItem.Value);
+                var aItem = this.PickList[i];
+                var outStr = String.Format("[{0}]\t{1}\t{2}", aItem.Id, aItem.Weight, aItem.Value);
                 sb.AppendLine(outStr);
                 this.UIReference.Text += outStr + Environment.NewLine;
                 sumValue += aItem.Value;
@@ -85,7 +86,8 @@ namespace Knapsack
             retDict.Add("TotalValue", sumValue.ToString("0"));
             retDict.Add("TotalWeight", this.FinalWeight.ToString());
             this.UIReference.Text += String.Format("Knapsack Capacity:{0}", this.Capacity) + Environment.NewLine;
-            this.UIReference.Text += String.Format("TotalV:{0} TotalW:{1} Load-Rate:{2}%", sumValue.ToString("0"), this.FinalWeight, loadRate) + Environment.NewLine;
+            this.UIReference.Text += String.Format("TotalW:{0} Load-Rate:{1}%", this.FinalWeight, loadRate) + Environment.NewLine;
+            this.UIReference.Text += String.Format("TotalV:{0}", sumValue.ToString("0")) + Environment.NewLine;
             returnDict = retDict;
         }
 
@@ -154,11 +156,19 @@ namespace Knapsack
                 {
                     break;
                 }
-                if (i == Items.Count - 1 && leftSpace >= itemObj.Weight)
+                if (i == Items.Count - 1)
                 {
-                    retList.Add(itemObj);
-                }
-                else if (DPTable[i, leftSpace] - DPTable[i + 1, leftSpace - itemObj.Weight] == itemObj.Value)
+					if (leftSpace >= itemObj.Weight)
+					{
+						retList.Add(itemObj);
+						leftSpace -= itemObj.Weight;
+					}
+					else
+					{
+						break;
+					}
+				}
+                else if (DPTable[i, leftSpace] != DPTable[i + 1, leftSpace])
                 {
                     retList.Add(itemObj);
                     leftSpace -= itemObj.Weight;
