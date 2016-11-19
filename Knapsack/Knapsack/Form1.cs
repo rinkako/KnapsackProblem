@@ -133,24 +133,6 @@ namespace Knapsack
 		}
 
 		/// <summary>
-		/// 按钮：贪心算法
-		/// </summary>
-		private void button4_Click(object sender, EventArgs e)
-		{
-			if (this.testProblemString == String.Empty)
-			{
-				MessageBox.Show("请先生成测试数据");
-				return;
-			}
-			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			Solver solver = new GreedySolver();
-			solver.Init(this.output_textBox);
-			solver.Solve(this.testProblemString);
-			this.method_label.Text = "贪心算法";
-			this.PostSolve(solver, ref Rets);
-		}
-
-		/// <summary>
 		/// 按钮：导入测试
 		/// </summary>
 		private void button8_Click(object sender, EventArgs e)
@@ -167,6 +149,25 @@ namespace Knapsack
 			fs.Close();
 		}
 
+		/// <summary>
+		/// 按钮：贪心算法
+		/// </summary>
+		private void button4_Click(object sender, EventArgs e)
+		{
+			if (this.testProblemString == String.Empty)
+			{
+				MessageBox.Show("请先生成测试数据");
+				return;
+			}
+			this.method_label.Text = "计算中…";
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
+			Solver solver = new GreedySolver();
+			solver.Init(this.output_textBox);
+			solver.Solve(this.testProblemString);
+			this.method_label.Text = "贪心算法";
+			this.PostSolve(solver, ref Rets);
+		}
+		
         /// <summary>
         /// 按钮：动态规划
         /// </summary>
@@ -177,7 +178,8 @@ namespace Knapsack
                 MessageBox.Show("请先生成测试数据");
                 return;
             }
-            Dictionary<string, string> Rets = new Dictionary<string, string>();
+			this.method_label.Text = "计算中…";
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
             Solver solver = new DynamicPlanSolver();
             solver.Init(this.output_textBox);
             solver.Solve(this.testProblemString);
@@ -195,6 +197,7 @@ namespace Knapsack
 				MessageBox.Show("请先生成测试数据");
 				return;
 			}
+			this.method_label.Text = "计算中…";
 			Dictionary<string, string> Rets = new Dictionary<string, string>();
 			Solver solver = new BranchBoundSolver();
 			solver.Init(this.output_textBox);

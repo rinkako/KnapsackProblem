@@ -40,27 +40,28 @@ namespace Knapsack
 		{
 			get
 			{
-				return (double)this.Value / (double)this.Weight;
+				return this.Value == 0 && this.Weight == 0 ? 0 :
+					(double)this.Value / (double)this.Weight;
 			}
 		}
 
 		/// <summary>
-		/// 物品标识符
+		/// 获取或设置物品标识符
 		/// </summary>
 		public string Id { get; set; }
 
 		/// <summary>
-		/// 物品质量
+		/// 获取或设置物品质量
 		/// </summary>
 		public int Weight { get; set; }
 
 		/// <summary>
-		/// 价值
+		/// 获取或设置物品价值
 		/// </summary>
 		public int Value { get; set; }
 
 		/// <summary>
-		/// 脏位
+		/// 获取或设置脏位
 		/// </summary>
 		public bool Dirty { get; set; }
 	}
