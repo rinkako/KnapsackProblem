@@ -110,20 +110,20 @@ namespace Knapsack
 			while (true)
 			{
 				// 左子树（放入）可以拓展
-				double LeftWeight = currentWeight + this.Items[itemId].Weight;
+				double LeftWeight = this.currentWeight + this.Items[itemId].Weight;
 				if (LeftWeight <= this.Capacity)         
 				{
-					if (currentValue + this.Items[itemId].Value > this.currentBestValue)
+					if (this.currentValue + this.Items[itemId].Value > this.currentBestValue)
 					{
-						this.currentBestValue = currentValue + this.Items[itemId].Value;
+						this.currentBestValue = this.currentValue + this.Items[itemId].Value;
 						this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-							currentValue + this.Items[itemId].Value, currentWeight + this.Items[itemId].Weight,
+							this.currentValue + this.Items[itemId].Value, this.currentWeight + this.Items[itemId].Weight,
 							itemId + 1, true, currentExpandNode);
 					}
 					else
 					{
-						this.InsertToHeap(currentUpperBound, currentValue + this.Items[itemId].Value,
-						currentWeight + this.Items[itemId].Weight, itemId + 1, true, currentExpandNode);
+						this.InsertToHeap(currentUpperBound, this.currentValue + this.Items[itemId].Value,
+						this.currentWeight + this.Items[itemId].Weight, itemId + 1, true, currentExpandNode);
 					}
 				}
 				currentUpperBound = this.GetMaxBound(itemId + 1);
@@ -131,7 +131,7 @@ namespace Knapsack
 				if (currentUpperBound >= this.currentBestValue)
 				{
 					this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-						currentValue, currentWeight, itemId + 1, false, currentExpandNode);
+						this.currentValue, this.currentWeight, itemId + 1, false, currentExpandNode);
 				}
 				// 所有节点都已经展开就返回
 				if (this.heapQueue.Empty())
@@ -141,8 +141,8 @@ namespace Knapsack
 				// 取下一个要生长的节点
 				currentExpandNode = this.heapQueue.Top();
 				this.heapQueue.Pop();
-                currentWeight = currentExpandNode.AccWeight;
-				currentValue = currentExpandNode.AccValue;
+				this.currentWeight = currentExpandNode.AccWeight;
+				this.currentValue = currentExpandNode.AccValue;
 				currentUpperBound = currentExpandNode.ValueUpperBound;
 				itemId = currentExpandNode.Level;
 			}

@@ -48,7 +48,16 @@ namespace Knapsack
 				var aV = Convert.ToInt32(aLine[2]);
 				this.Items.Add(new PackageItem((i - 2).ToString(), aW, aV));
 			}
+			// 对单位价值做排序
+			this.Items.Sort((x, y) =>
+			{
+				if (x.UnitValue > y.UnitValue) { return -1; }
+				else if (x.UnitValue < y.UnitValue) { return 1; }
+				else { return 0; }
+			});
 			// 初始化算法
+			this.currentMaxBound = 0;
+			this.currentBestValue = 0;
 			this.candidateRouterNode = null;
 			BBNode recursiveNode = new BBNode(-1, null);
 			// 调用回溯函数，开始递归求解
@@ -77,6 +86,8 @@ namespace Knapsack
 				}
 				return;
 			}
+			// 计算价值上界
+			this.currentMaxBound = this.GetValueBound(depth, parent);
 			// 如果下一物体可以放入就尝试放入
 			if (parent.AccWeight + this.Items[depth].Weight <= this.Capacity)
 			{
@@ -85,14 +96,25 @@ namespace Knapsack
 				leftNode.Pick = true;
 				leftNode.AccValue = parent.AccValue + this.Items[depth].Value;
 				leftNode.AccWeight = parent.AccWeight + this.Items[depth].Weight;
+				leftNode.ValueUpperBound = this.currentMaxBound;
+				// 更新最大价值
+				if (this.currentBestValue < leftNode.AccValue)
+				{
+					this.currentBestValue = leftNode.AccValue;
+				}
 				// 递归
 				this.BackTrace(depth + 1, leftNode);
 			}
 			// 不放入当前物品的情况
-			BBNode rightNode = new BBNode(depth, parent);
-			rightNode.AccValue = parent.AccValue;
-			rightNode.AccWeight = parent.AccWeight;
-			this.BackTrace(depth + 1, rightNode);
+			this.currentMaxBound = this.GetValueBound(depth + 1, parent);
+			if (this.currentMaxBound >= this.currentBestValue)
+			{
+				BBNode rightNode = new BBNode(depth, parent);
+				rightNode.AccValue = parent.AccValue;
+				rightNode.AccWeight = parent.AccWeight;
+				rightNode.ValueUpperBound = this.currentMaxBound;
+				this.BackTrace(depth + 1, rightNode);
+			}
 		}
 
 		/// <summary>
@@ -113,6 +135,30 @@ namespace Knapsack
 				}
 				iterNode = iterNode.Parent;
 			}
+		}
+
+		/// <summary>
+		/// 求子树的价值上界
+		/// </summary>
+		/// <param name="itemId">当前考虑的物品</param>
+		/// <returns>最大上界</returns>
+		private double GetValueBound(int itemId, BBNode currentNode)
+		{
+			double space = this.Capacity - currentNode.AccWeight;
+			double maxborder = currentNode.AccValue;
+			// 要放入的所有物品应该比当前剩余空间还要小
+			while (itemId < this.ItemTypeCount && this.Items[itemId].Weight <= space)
+			{
+				space -= this.Items[itemId].Weight;
+				maxborder += this.Items[itemId].Value;
+				itemId++;
+			}
+			// 装填剩余容量装满背包
+			if (itemId < this.ItemTypeCount)
+			{
+				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
+			}
+			return maxborder;
 		}
 
 		/// <summary>
@@ -201,7 +247,17 @@ namespace Knapsack
 		/// 当前最优解最后一个节点
 		/// </summary>
 		private BBNode candidateRouterNode;
-		
+
+		/// <summary>
+		/// 当前价值上界
+		/// </summary>
+		private double currentMaxBound;
+
+		/// <summary>
+		/// 当前最大价值
+		/// </summary>
+		private double currentBestValue;
+
 		/// <summary>
 		/// 物品列表（编号，质量，价值，单位价值）
 		/// </summary>
