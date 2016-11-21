@@ -8,21 +8,6 @@ namespace Knapsack
 	public partial class MainForm : Form
 	{
 		/// <summary>
-		/// 问题生成器引用
-		/// </summary>
-		private ProblemGenerator ProblemGen = ProblemGenerator.GetInstance();
-
-		/// <summary>
-		/// 生成的测试数据对应的字符串
-		/// </summary>
-		private string testProblemString = String.Empty;
-
-		/// <summary>
-		/// 生成的测试数据的描述
-		/// </summary>
-		private string testStringDescriptor = String.Empty;
-
-		/// <summary>
 		/// 构造器
 		/// </summary>
 		public MainForm()
@@ -38,7 +23,7 @@ namespace Knapsack
 
 		private void numericUpDown1_ValueChanged(object sender, EventArgs e)
 		{
-			if (this.numericUpDown1.Value > this.numericUpDown2.Value) { this.numericUpDown1.Value = 0; }
+			if (this.numericUpDown1.Value > this.numericUpDown2.Value) { this.numericUpDown1.Value = this.numericUpDown1.Minimum; }
 		}
 
 		private void numericUpDown2_ValueChanged(object sender, EventArgs e)
@@ -48,7 +33,7 @@ namespace Knapsack
 
 		private void numericUpDown4_ValueChanged(object sender, EventArgs e)
 		{
-			if (this.numericUpDown4.Value > this.numericUpDown3.Value) { this.numericUpDown4.Value = 0; }
+			if (this.numericUpDown4.Value > this.numericUpDown3.Value) { this.numericUpDown4.Value = this.numericUpDown4.Minimum; }
 		}
 
 		private void numericUpDown3_ValueChanged(object sender, EventArgs e)
@@ -58,7 +43,7 @@ namespace Knapsack
 
 		private void numericUpDown6_ValueChanged(object sender, EventArgs e)
 		{
-			if (this.numericUpDown6.Value > this.numericUpDown5.Value) { this.numericUpDown6.Value = 0; }
+			if (this.numericUpDown6.Value > this.numericUpDown5.Value) { this.numericUpDown6.Value = this.numericUpDown6.Minimum; }
 		}
 
 		private void numericUpDown5_ValueChanged(object sender, EventArgs e)
@@ -150,22 +135,34 @@ namespace Knapsack
 		}
 
 		/// <summary>
-		/// 按钮：贪心算法
+		/// 调用问题解决器
 		/// </summary>
-		private void button4_Click(object sender, EventArgs e)
+		/// <param name="solver">解决器实例</param>
+		/// <param name="methodName">算法名称</param>
+		/// <param name="paras">参数列表</param>
+		/// <returns>返回值字典</returns>
+		private Dictionary<string, string> CallSolver(Solver solver, string methodName, params string[] paras)
 		{
 			if (this.testProblemString == String.Empty)
 			{
 				MessageBox.Show("请先生成测试数据");
-				return;
+				return null;
 			}
 			this.method_label.Text = "计算中…";
 			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			Solver solver = new GreedySolver();
-			solver.Init(this.output_textBox);
+			solver.Init(this.output_textBox, paras);
 			solver.Solve(this.testProblemString);
-			this.method_label.Text = "贪心算法";
+			this.method_label.Text = methodName;
 			this.PostSolve(solver, ref Rets);
+			return Rets;
+		}
+		
+		/// <summary>
+		/// 按钮：贪心算法
+		/// </summary>
+		private void button4_Click(object sender, EventArgs e)
+		{
+			this.CallSolver(new GreedySolver(), "贪心算法");
 		}
 		
         /// <summary>
@@ -173,37 +170,15 @@ namespace Knapsack
         /// </summary>
         private void button5_Click(object sender, EventArgs e)
         {
-            if (this.testProblemString == String.Empty)
-            {
-                MessageBox.Show("请先生成测试数据");
-                return;
-            }
-			this.method_label.Text = "计算中…";
-			Dictionary<string, string> Rets = new Dictionary<string, string>();
-            Solver solver = new DynamicPlanSolver();
-            solver.Init(this.output_textBox);
-            solver.Solve(this.testProblemString);
-            this.method_label.Text = "动态规划";
-            this.PostSolve(solver, ref Rets);
-        }
+			this.CallSolver(new DynamicPlanSolver(), "动态规划");
+		}
 
 		/// <summary>
 		/// 按钮：分支界限
 		/// </summary>
 		private void button6_Click(object sender, EventArgs e)
 		{
-			if (this.testProblemString == String.Empty)
-			{
-				MessageBox.Show("请先生成测试数据");
-				return;
-			}
-			this.method_label.Text = "计算中…";
-			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			Solver solver = new BranchBoundSolver();
-			solver.Init(this.output_textBox);
-			solver.Solve(this.testProblemString);
-			this.method_label.Text = "分支界限";
-			this.PostSolve(solver, ref Rets);
+			this.CallSolver(new BranchBoundSolver(), "分支界限");
 		}
 
 		/// <summary>
@@ -211,34 +186,30 @@ namespace Knapsack
 		/// </summary>
 		private void button9_Click(object sender, EventArgs e)
 		{
-			if (this.testProblemString == String.Empty)
-			{
-				MessageBox.Show("请先生成测试数据");
-				return;
-			}
-			this.method_label.Text = "计算中…";
-			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			Solver solver = new BackTraceSolver();
-			solver.Init(this.output_textBox);
-			solver.Solve(this.testProblemString);
-			this.method_label.Text = "回溯";
-			this.PostSolve(solver, ref Rets);
+			this.CallSolver(new BackTraceSolver(), "回溯");
 		}
 
+		/// <summary>
+		/// 按钮：模拟退火
+		/// </summary>
 		private void button7_Click(object sender, EventArgs e)
 		{
-			if (this.testProblemString == String.Empty)
-			{
-				MessageBox.Show("请先生成测试数据");
-				return;
-			}
-			this.method_label.Text = "计算中…";
-			Dictionary<string, string> Rets = new Dictionary<string, string>();
-			Solver solver = new SimulatedAnnealingSolver();
-			solver.Init(this.output_textBox);
-			solver.Solve(this.testProblemString);
-			this.method_label.Text = "模拟退火";
-			this.PostSolve(solver, ref Rets);
+			this.CallSolver(new SimulatedAnnealingSolver(), "模拟退火", this.numericUpDown7.Value.ToString());
 		}
+
+		/// <summary>
+		/// 问题生成器引用
+		/// </summary>
+		private ProblemGenerator ProblemGen = ProblemGenerator.GetInstance();
+
+		/// <summary>
+		/// 生成的测试数据对应的字符串
+		/// </summary>
+		private string testProblemString = String.Empty;
+
+		/// <summary>
+		/// 生成的测试数据的描述
+		/// </summary>
+		private string testStringDescriptor = String.Empty;
 	}
 }

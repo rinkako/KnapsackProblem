@@ -19,6 +19,14 @@ namespace Knapsack
 		public override void Init(TextBox console, params string[] paras)
 		{
 			this.UIReference = console;
+			if (paras.Length > 0)
+			{
+				int epoch;
+				if (Int32.TryParse(paras[0], out epoch))
+				{
+					this.Epoch = epoch;
+				}
+			}
 		}
 
 		/// <summary>
