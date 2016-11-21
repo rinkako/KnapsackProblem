@@ -41,31 +41,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\MaxHeap.cs" />
+    <Compile Include="Base\PriorityQueue.cs" />
+    <Compile Include="Solver\BackTraceSolver.cs" />
     <Compile Include="Base\BBNode.cs" />
-    <Compile Include="BranchBoundSolver.cs" />
-    <Compile Include="DynamicPlanSolver.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Solver\BranchBoundSolver.cs" />
+    <Compile Include="Solver\DynamicPlanSolver.cs" />
+    <Compile Include="Form\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="Form\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GreedySolver.cs" />
+    <Compile Include="Solver\GreedySolver.cs" />
     <Compile Include="Base\PackageItem.cs" />
-    <Compile Include="Solver.cs" />
-    <Compile Include="PreviewForm.cs">
+    <Compile Include="Solver\Solver.cs" />
+    <Compile Include="Form\PreviewForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PreviewForm.Designer.cs">
+    <Compile Include="Form\PreviewForm.Designer.cs">
       <DependentUpon>PreviewForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProblemGenerator.cs" />
+    <Compile Include="Solver\ProblemGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="Form\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PreviewForm.resx">
+    <EmbeddedResource Include="Form\PreviewForm.resx">
       <DependentUpon>PreviewForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

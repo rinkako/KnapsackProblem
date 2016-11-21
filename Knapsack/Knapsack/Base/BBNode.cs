@@ -8,7 +8,7 @@ namespace Knapsack
 	/// <summary>
 	/// 解空间树节点类
 	/// </summary>
-	public class BBNode
+	public class BBNode : IComparable<BBNode>
 	{
 		/// <summary>
 		/// 构造器
@@ -24,6 +24,16 @@ namespace Knapsack
 			this.Pick = false;
 		}
 
+		/// <summary>
+		/// 重写比较函数
+		/// </summary>
+		/// <param name="rhs">要比较的项目</param>
+		/// <returns>调整方向</returns>
+		public int CompareTo(BBNode rhs)
+		{
+			return this.ValueUpperBound.CompareTo(rhs.ValueUpperBound);
+		}
+		
 		/// <summary>
 		/// 重写字符串化方法
 		/// </summary>

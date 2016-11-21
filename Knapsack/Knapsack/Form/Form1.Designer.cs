@@ -29,6 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.button8 = new System.Windows.Forms.Button();
 			this.button3 = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
 			this.button1 = new System.Windows.Forms.Button();
@@ -47,7 +48,7 @@
 			this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.button8 = new System.Windows.Forms.Button();
+			this.button9 = new System.Windows.Forms.Button();
 			this.method_label = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
 			this.cost_label = new System.Windows.Forms.Label();
@@ -71,6 +72,7 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.button8);
 			this.groupBox1.Controls.Add(this.button3);
 			this.groupBox1.Controls.Add(this.button2);
 			this.groupBox1.Controls.Add(this.button1);
@@ -94,6 +96,16 @@
 			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "数据生成";
+			// 
+			// button8
+			// 
+			this.button8.Location = new System.Drawing.Point(110, 14);
+			this.button8.Name = "button8";
+			this.button8.Size = new System.Drawing.Size(66, 23);
+			this.button8.TabIndex = 10;
+			this.button8.Text = "导入测试";
+			this.button8.UseVisualStyleBackColor = true;
+			this.button8.Click += new System.EventHandler(this.button8_Click);
 			// 
 			// button3
 			// 
@@ -308,7 +320,7 @@
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.button8);
+			this.groupBox2.Controls.Add(this.button9);
 			this.groupBox2.Controls.Add(this.method_label);
 			this.groupBox2.Controls.Add(this.label12);
 			this.groupBox2.Controls.Add(this.cost_label);
@@ -326,15 +338,15 @@
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "问题解决";
 			// 
-			// button8
+			// button9
 			// 
-			this.button8.Location = new System.Drawing.Point(6, 176);
-			this.button8.Name = "button8";
-			this.button8.Size = new System.Drawing.Size(75, 23);
-			this.button8.TabIndex = 10;
-			this.button8.Text = "导入测试";
-			this.button8.UseVisualStyleBackColor = true;
-			this.button8.Click += new System.EventHandler(this.button8_Click);
+			this.button9.Location = new System.Drawing.Point(6, 116);
+			this.button9.Name = "button9";
+			this.button9.Size = new System.Drawing.Size(75, 23);
+			this.button9.TabIndex = 10;
+			this.button9.Text = "回溯";
+			this.button9.UseVisualStyleBackColor = true;
+			this.button9.Click += new System.EventHandler(this.button9_Click);
 			// 
 			// method_label
 			// 
@@ -374,7 +386,7 @@
 			// 
 			// button7
 			// 
-			this.button7.Location = new System.Drawing.Point(6, 116);
+			this.button7.Location = new System.Drawing.Point(6, 145);
 			this.button7.Name = "button7";
 			this.button7.Size = new System.Drawing.Size(75, 23);
 			this.button7.TabIndex = 5;
@@ -488,6 +500,7 @@
 		private System.Windows.Forms.Label method_label;
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Button button8;
+		private System.Windows.Forms.Button button9;
 	}
 }
 

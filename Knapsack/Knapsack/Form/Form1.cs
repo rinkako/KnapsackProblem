@@ -205,5 +205,24 @@ namespace Knapsack
 			this.method_label.Text = "分支界限";
 			this.PostSolve(solver, ref Rets);
 		}
+
+		/// <summary>
+		/// 按钮：回溯
+		/// </summary>
+		private void button9_Click(object sender, EventArgs e)
+		{
+			if (this.testProblemString == String.Empty)
+			{
+				MessageBox.Show("请先生成测试数据");
+				return;
+			}
+			this.method_label.Text = "计算中…";
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
+			Solver solver = new BackTraceSolver();
+			solver.Init(this.output_textBox);
+			solver.Solve(this.testProblemString);
+			this.method_label.Text = "回溯";
+			this.PostSolve(solver, ref Rets);
+		}
 	}
 }

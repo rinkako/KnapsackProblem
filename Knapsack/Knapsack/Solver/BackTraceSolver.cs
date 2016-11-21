@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Knapsack
 {
 	/// <summary>
-	///  分支界限解决器
+	/// 回溯法问题解决器
 	/// </summary>
-	class BranchBoundSolver : Solver
+	class BackTraceSolver : Solver
 	{
-
 		/// <summary>
 		/// 初始化问题解决器
 		/// </summary>
@@ -47,130 +46,53 @@ namespace Knapsack
 				var aLine = lineitem[i].Split('\t');
 				var aW = Convert.ToInt32(aLine[1]);
 				var aV = Convert.ToInt32(aLine[2]);
-				var addItem = new PackageItem((i - 2).ToString(), aW, aV);
-                this.Items.Add(addItem);
+				this.Items.Add(new PackageItem((i - 2).ToString(), aW, aV));
 			}
-			// 对单位价值做排序
-			this.Items.Sort((x, y) =>
-			{
-				if (x.UnitValue > y.UnitValue) { return -1; }
-				else if (x.UnitValue < y.UnitValue) { return 1; }
-				else { return 0; }
-			});
-			// 补位
-			PackageItem AppendBack = new PackageItem("AppenderBack", 0, 0);
-			this.Items.Add(AppendBack);
-			// 复原当前背包状态
-			this.currentWeight = 0;
-			this.currentValue = 0;
-			this.currentBestValue = 0;
-			this.heap = new Stack<BBNode>();
-			// 搜索
-			this.BranchAndBound();
+			// 初始化算法
+			this.candidateRouterNode = null;
+			BBNode recursiveNode = new BBNode(-1, null);
+			// 调用回溯函数，开始递归求解
+			this.BackTrace(0, recursiveNode);
 			// 反算路径
 			this.GetSolutionRouter();
 			// 算法结束
 			this.EndTimeStamp = DateTime.Now;
 		}
-		
-		/// <summary>
-		/// 求子树的价值上界
-		/// </summary>
-		/// <param name="itemId">当前考虑的物品</param>
-		/// <returns>最大上界</returns>
-		private double GetMaxBound(int itemId)
-		{
-			double space = this.Capacity - currentWeight;
-			double maxborder = currentValue;
-			// 要放入的所有物品应该比当前剩余空间还要小
-			while (itemId < this.ItemTypeCount && this.Items[itemId].Weight <= space)
-			{
-				space -= this.Items[itemId].Weight;
-				maxborder += this.Items[itemId].Value;
-				itemId++;
-			}
-			// 装填剩余容量装满背包
-			if (itemId < this.ItemTypeCount)
-			{
-				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
-			}
-			return maxborder;
-		}
-		
-		/// <summary>
-		/// 分支界限求最大价值路径
-		/// </summary>
-		/// <returns>能够达到的最大价值</returns>
-		private void BranchAndBound()
-		{
-			int itemId = 0;
-			double currentUpperBound = this.GetMaxBound(itemId);
-			this.heap = new Stack<BBNode>();
-			BBNode currentExpandNode = null;
-			// 分支界限搜索
-			while (true)
-			{
-				// 左子树（放入）可以拓展
-				double LeftWeight = currentWeight + this.Items[itemId].Weight;
-				if (LeftWeight <= this.Capacity)         
-				{
-					if (currentValue + this.Items[itemId].Value > this.currentBestValue)
-					{
-						this.currentBestValue = currentValue + this.Items[itemId].Value;
-						this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-							currentValue + this.Items[itemId].Value, currentWeight + this.Items[itemId].Weight,
-							itemId + 1, true, currentExpandNode);
-					}
-					else
-					{
-						this.InsertToHeap(currentUpperBound, currentValue + this.Items[itemId].Value,
-						currentWeight + this.Items[itemId].Weight, itemId + 1, true, currentExpandNode);
-					}
-				}
-				currentUpperBound = this.GetMaxBound(itemId + 1);
-				// 右子树的价值上界比当前最大值还大才有拓展的意义
-				if (currentUpperBound >= this.currentBestValue)
-				{
-					this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-						currentValue, currentWeight, itemId + 1, false, currentExpandNode);
-				}
-				// 所有节点都已经展开就返回
-				if (heap.Count == 0)
-				{
-					return;
-				}
-				// 取下一个要生长的节点
-				currentExpandNode = heap.Pop();
-                currentWeight = currentExpandNode.AccWeight;
-				currentValue = currentExpandNode.AccValue;
-				currentUpperBound = currentExpandNode.ValueUpperBound;
-				itemId = currentExpandNode.Level;
-			}
-		}
 
 		/// <summary>
-		/// 将一个新的活结点插入到子集树和最大堆heap中
+		/// 回溯法搜索问题最优解
 		/// </summary>
-		/// <param name="maxValue">价值上界</param>
-		/// <param name="accValue">节点累积价值</param>
-		/// <param name="accWeight">节点累积质量</param>
-		/// <param name="level">节点层次</param>
-		/// <param name="pickFlag">是否挑选当前物品</param>
-		/// <param name="parent">上层节点</param>
-		/// <returns>加入的节点</returns>
-		private BBNode InsertToHeap(double maxValue, double accValue, double accWeight, int level, bool pickFlag, BBNode parent)
+		/// <param name="depth">当前递归的深度</param>
+		/// <param name="parent">搜索树上层节点</param>
+		private void BackTrace(int depth, BBNode parent)
 		{
-			BBNode node = new BBNode(level, null);
-			node.ValueUpperBound = maxValue;
-			node.AccValue = accValue;
-			node.AccWeight = accWeight;
-			node.Pick = pickFlag;
-			node.Parent = parent;
-			if (level <= this.ItemTypeCount)
+			// 递归边界
+			if (depth >= this.ItemTypeCount)
 			{
-				heap.Push(node);
+				// 优于局部最小值时替换她
+				if (this.candidateRouterNode == null ||
+					parent.AccValue > this.candidateRouterNode.AccValue)
+				{
+					this.candidateRouterNode = parent;
+				}
+				return;
 			}
-			return node;
+			// 如果下一物体可以放入就尝试放入
+			if (parent.AccWeight + this.Items[depth].Weight <= this.Capacity)
+			{
+				// 放入
+				BBNode leftNode = new BBNode(depth, parent);
+				leftNode.Pick = true;
+				leftNode.AccValue = parent.AccValue + this.Items[depth].Value;
+				leftNode.AccWeight = parent.AccWeight + this.Items[depth].Weight;
+				// 递归
+				this.BackTrace(depth + 1, leftNode);
+			}
+			// 不放入当前物品的情况
+			BBNode rightNode = new BBNode(depth, parent);
+			rightNode.AccValue = parent.AccValue;
+			rightNode.AccWeight = parent.AccWeight;
+			this.BackTrace(depth + 1, rightNode);
 		}
 
 		/// <summary>
@@ -179,20 +101,20 @@ namespace Knapsack
 		private void GetSolutionRouter()
 		{
 			this.PickList = new List<PackageItem>();
-			var iterNode = this.CandidateRouterDestination;
+			var iterNode = this.candidateRouterNode;
 			this.FinalWeight = 0;
 			while (iterNode != null)
 			{
 				if (iterNode.Pick == true && iterNode.Level < this.ItemTypeCount)
 				{
-					var picker = this.Items[iterNode.Level - 1];
-                    this.PickList.Add(picker);
+					var picker = this.Items[iterNode.Level];
+					this.PickList.Add(picker);
 					this.FinalWeight += picker.Weight;
-                }
+				}
 				iterNode = iterNode.Parent;
 			}
 		}
-		
+
 		/// <summary>
 		/// 获取问题解决的结果
 		/// </summary>
@@ -210,6 +132,7 @@ namespace Knapsack
 			Dictionary<string, string> retDict = new Dictionary<string, string>();
 			// 选中的项目
 			StringBuilder sb = new StringBuilder();
+			double sumValue = 0;
 			this.UIReference.Text += "ID\tW\tV" + Environment.NewLine;
 			for (int i = 0; i < this.PickList.Count; i++)
 			{
@@ -217,20 +140,20 @@ namespace Knapsack
 				var outStr = String.Format("[{0}]\t{1}\t{2}", aItem.Id, aItem.Weight, aItem.Value);
 				sb.AppendLine(outStr);
 				this.UIReference.Text += outStr + Environment.NewLine;
+				sumValue += aItem.Value;
 			}
 			retDict.Add("Output", sb.ToString());
 			// 装入总重量
 			string loadRate = (((double)this.FinalWeight / (double)this.Capacity) * 100.0).ToString("0.0000");
 			retDict.Add("LoadRate", loadRate);
-			retDict.Add("TotalValue", this.currentBestValue.ToString("0"));
+			retDict.Add("TotalValue", sumValue.ToString("0"));
 			retDict.Add("TotalWeight", this.FinalWeight.ToString());
 			this.UIReference.Text += String.Format("Knapsack Capacity:{0}", this.Capacity) + Environment.NewLine;
-			this.UIReference.Text += String.Format("MaxDepth of Solution Tree:{0}", this.CandidateRouterDestination.Level) + Environment.NewLine;
 			this.UIReference.Text += String.Format("TotalW:{0} Load-Rate:{1}%", this.FinalWeight, loadRate) + Environment.NewLine;
-			this.UIReference.Text += String.Format("TotalV:{0}", this.currentBestValue.ToString("0")) + Environment.NewLine;
+			this.UIReference.Text += String.Format("TotalV:{0}", sumValue.ToString("0")) + Environment.NewLine;
 			returnDict = retDict;
 		}
-		
+
 		/// <summary>
 		/// 获取问题解决的结果并写入文件
 		/// </summary>
@@ -258,7 +181,6 @@ namespace Knapsack
 			FileStream fs = new FileStream(filename, FileMode.Create);
 			StreamWriter sw = new StreamWriter(fs);
 			sw.WriteLine(sb.ToString());
-			sw.WriteLine("MaxDepth of Solution Tree: " + (this.CandidateRouterDestination.Level).ToString());
 			sw.WriteLine("LoadRate: " + loadRate + "%");
 			sw.WriteLine("TotalWeight: " + this.FinalWeight.ToString() + "/" + this.Capacity.ToString());
 			sw.WriteLine("TotalValue: " + sumValue.ToString("0"));
@@ -276,37 +198,17 @@ namespace Knapsack
 		}
 		
 		/// <summary>
-		/// 当前背包重量
+		/// 当前最优解最后一个节点
 		/// </summary>
-		private double currentWeight;
-
-		/// <summary>
-		/// 当前背包价值
-		/// </summary>
-		private double currentValue;
-
-		/// <summary>
-		/// 最优的背包价值
-		/// </summary>
-		private double currentBestValue;
-
-		/// <summary>
-		/// 最大堆
-		/// </summary>
-		private Stack<BBNode> heap;
-
+		private BBNode candidateRouterNode;
+		
 		/// <summary>
 		/// 物品列表（编号，质量，价值，单位价值）
 		/// </summary>
 		private List<PackageItem> Items;
-
+		
 		/// <summary>
-		/// 候选路径
-		/// </summary>
-		private BBNode CandidateRouterDestination;
-
-		/// <summary>
-		/// Pick表
+		/// 选中列表
 		/// </summary>
 		private List<PackageItem> PickList;
 	}
