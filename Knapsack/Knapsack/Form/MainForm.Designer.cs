@@ -1,6 +1,6 @@
 ﻿namespace Knapsack
 {
-	partial class Form1
+	partial class MainForm
 	{
 		/// <summary>
 		/// 必需的设计器变量。
@@ -392,6 +392,7 @@
 			this.button7.TabIndex = 5;
 			this.button7.Text = "模拟退火";
 			this.button7.UseVisualStyleBackColor = true;
+			this.button7.Click += new System.EventHandler(this.button7_Click);
 			// 
 			// button6
 			// 
@@ -441,7 +442,7 @@
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
-			// Form1
+			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -451,7 +452,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "Form1";
+			this.Name = "MainForm";
 			this.Text = "Knapsack Problem";
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();

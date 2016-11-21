@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Knapsack
 {
-	public partial class Form1 : Form
+	public partial class MainForm : Form
 	{
 		/// <summary>
 		/// 问题生成器引用
@@ -25,7 +25,7 @@ namespace Knapsack
 		/// <summary>
 		/// 构造器
 		/// </summary>
-		public Form1()
+		public MainForm()
 		{
 			InitializeComponent();
 		}
@@ -222,6 +222,22 @@ namespace Knapsack
 			solver.Init(this.output_textBox);
 			solver.Solve(this.testProblemString);
 			this.method_label.Text = "回溯";
+			this.PostSolve(solver, ref Rets);
+		}
+
+		private void button7_Click(object sender, EventArgs e)
+		{
+			if (this.testProblemString == String.Empty)
+			{
+				MessageBox.Show("请先生成测试数据");
+				return;
+			}
+			this.method_label.Text = "计算中…";
+			Dictionary<string, string> Rets = new Dictionary<string, string>();
+			Solver solver = new SimulatedAnnealingSolver();
+			solver.Init(this.output_textBox);
+			solver.Solve(this.testProblemString);
+			this.method_label.Text = "模拟退火";
 			this.PostSolve(solver, ref Rets);
 		}
 	}

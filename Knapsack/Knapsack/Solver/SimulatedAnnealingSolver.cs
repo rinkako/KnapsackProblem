@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace Knapsack
 {
 	/// <summary>
-	/// 回溯法问题解决器
+	/// 模拟退火问题解决器
 	/// </summary>
-	class BackTraceSolver : Solver
+	class SimulatedAnnealingSolver : Solver
 	{
 		/// <summary>
 		/// 初始化问题解决器
@@ -48,24 +48,144 @@ namespace Knapsack
 				var aV = Convert.ToInt32(aLine[2]);
 				this.Items.Add(new PackageItem((i - 2).ToString(), aW, aV));
 			}
-			// 对单位价值做排序
-			this.Items.Sort((x, y) =>
-			{
-				if (x.UnitValue > y.UnitValue) { return -1; }
-				else if (x.UnitValue < y.UnitValue) { return 1; }
-				else { return 0; }
-			});
-			// 初始化算法
-			this.currentMaxBound = 0;
+			// 初始化退火环境
+			this.currentBestRouter = new bool[this.ItemTypeCount];
+			this.previousBestRouter = new bool[this.ItemTypeCount];
+			this.currentRouter = new bool[this.ItemTypeCount];
 			this.currentBestValue = 0;
-			this.candidateRouterNode = null;
-			BBNode recursiveNode = new BBNode(-1, null);
-			// 调用回溯函数，开始递归求解
-			this.BackTrace(0, recursiveNode);
-			// 反算路径
+			this.previousBestValue = 0;
+			this.randomer = new Random();
+			// 搜索
+			this.SimulatedAnealing();
+			// 反算最优解组合
 			this.GetSolutionRouter();
 			// 算法结束
 			this.EndTimeStamp = DateTime.Now;
+		}
+
+		/// <summary>
+		/// 模拟退火搜索最优解
+		/// </summary>
+		private void SimulatedAnealing()
+		{
+			// 升温
+			double currentTemperature = this.BeginTemperature;
+			// 模拟退火
+			while (currentTemperature > this.EndTemperature)
+			{
+				// 恒温搜索
+				for (int i = 0; i < this.Epoch; i++)
+				{
+					// 扰动产生解
+					int cid1 = 0, cid2 = 0;
+					while (cid1 == cid2)
+					{
+						cid1 = this.randomer.Next(0, this.ItemTypeCount);
+						cid2 = this.randomer.Next(0, this.ItemTypeCount);
+					}
+					this.currentRouter[cid1] = true;
+					this.currentRouter[cid2] = true;
+					if (this.GetCurrentWeight() > this.Capacity)
+					{
+						this.currentRouter[cid2] = false;
+					}
+					if (this.GetCurrentWeight() > this.Capacity)
+					{
+						this.currentRouter[cid1] = false;
+					}
+					// 计算增量
+					double currentValue = this.GetValue(this.currentRouter);
+                    double delta = currentValue - this.currentBestValue;
+					// 如果情况改善了局部最优值就直接接受她
+					if (delta > 0)
+					{
+						Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+						Array.Copy(this.currentRouter, this.currentBestRouter, this.ItemTypeCount);
+						this.previousBestValue = this.currentBestValue = currentValue;
+                    }
+					// 否则需要进一步计算
+					else
+					{
+						delta = currentValue - this.previousBestValue;
+						// 如果能够改善上一次移动，就接受她
+						if (delta > 0)
+						{
+							Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+							this.previousBestValue = currentValue;
+						}
+						// 否则她是一次没有正面作用的移动，那么只能以一定概率接受她
+						else
+						{
+							// 随机移动
+							double acceptCoin = this.randomer.Next(0, Int32.MaxValue) % 20001 / 20000.0;
+							// 落在接受域
+							if (Math.Exp(delta / currentTemperature) > acceptCoin)
+							{
+								Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+								this.previousBestValue = currentValue;
+							}
+							// 落在拒绝域，回滚本次改变
+							else
+							{
+								Array.Copy(this.previousBestRouter, this.currentRouter, this.ItemTypeCount);
+							}
+						}
+					}
+				}
+				// 降温
+				currentTemperature *= this.AnealingRatio;
+			}
+		}
+		
+		/// <summary>
+		/// 反向计算到达最优值的组合
+		/// </summary>
+		private void GetSolutionRouter()
+		{
+			this.PickList = new List<PackageItem>();
+			for (int i = 0; i < this.ItemTypeCount; i++)
+			{
+				if (this.currentBestRouter[i])
+				{
+					this.PickList.Add(this.Items[i]);
+					this.FinalWeight += this.Items[i].Weight;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 获取当前总质量
+		/// </summary>
+		/// <returns>当前背包总质量</returns>
+		private double GetCurrentWeight()
+		{
+			double acc = 0;
+			for (int i = 0; i < this.currentRouter.Length; i++)
+			{
+				if (this.currentRouter[i])
+				{
+					acc += this.Items[i].Weight;
+				}
+			}
+			return acc;
+		}
+
+		/// <summary>
+		/// 获取当前总价值
+		/// </summary>
+		/// <param name="pickVec">物品选中情况描述向量</param>
+		/// <returns>当前背包总价值</returns>
+		private double GetValue(bool[] pickVec)
+		{
+			double acc = 0;
+			for (int i = 0; i < pickVec.Length; i++)
+			{
+				if (pickVec[i])
+				{
+					acc += this.Items[i].Value;
+				}
+			}
+			return acc;
 		}
 		
 		/// <summary>
@@ -151,120 +271,62 @@ namespace Knapsack
 		}
 
 		/// <summary>
-		/// 回溯法搜索问题最优解
+		/// 退火起始温度
 		/// </summary>
-		/// <param name="depth">当前递归的深度</param>
-		/// <param name="parent">搜索树上层节点</param>
-		private void BackTrace(int depth, BBNode parent)
-		{
-			// 递归边界
-			if (depth >= this.ItemTypeCount)
-			{
-				// 优于局部最小值时替换她
-				if (this.candidateRouterNode == null ||
-					parent.AccValue > this.candidateRouterNode.AccValue)
-				{
-					this.candidateRouterNode = parent;
-				}
-				return;
-			}
-			// 计算价值上界
-			this.currentMaxBound = this.GetValueBound(depth, parent);
-			// 如果下一物体可以放入就尝试放入
-			if (parent.AccWeight + this.Items[depth].Weight <= this.Capacity)
-			{
-				// 放入
-				BBNode leftNode = new BBNode(depth, parent);
-				leftNode.Pick = true;
-				leftNode.AccValue = parent.AccValue + this.Items[depth].Value;
-				leftNode.AccWeight = parent.AccWeight + this.Items[depth].Weight;
-				leftNode.ValueUpperBound = this.currentMaxBound;
-				// 更新最大价值
-				if (this.currentBestValue < leftNode.AccValue)
-				{
-					this.currentBestValue = leftNode.AccValue;
-				}
-				// 递归
-				this.BackTrace(depth + 1, leftNode);
-			}
-			// 不放入当前物品的情况
-			this.currentMaxBound = this.GetValueBound(depth + 1, parent);
-			if (this.currentMaxBound >= this.currentBestValue)
-			{
-				BBNode rightNode = new BBNode(depth, parent);
-				rightNode.AccValue = parent.AccValue;
-				rightNode.AccWeight = parent.AccWeight;
-				rightNode.ValueUpperBound = this.currentMaxBound;
-				this.BackTrace(depth + 1, rightNode);
-			}
-		}
+		private double BeginTemperature = 1000;
 
 		/// <summary>
-		/// 反向计算到达最优值的路径
+		/// 退火结束温度
 		/// </summary>
-		private void GetSolutionRouter()
-		{
-			this.PickList = new List<PackageItem>();
-			var iterNode = this.candidateRouterNode;
-			this.FinalWeight = 0;
-			while (iterNode != null)
-			{
-				if (iterNode.Pick == true && iterNode.Level < this.ItemTypeCount)
-				{
-					var picker = this.Items[iterNode.Level];
-					this.PickList.Add(picker);
-					this.FinalWeight += picker.Weight;
-				}
-				iterNode = iterNode.Parent;
-			}
-		}
+		private double EndTemperature = 0.01;
 
 		/// <summary>
-		/// 求子树的价值上界
+		/// 退火率
 		/// </summary>
-		/// <param name="itemId">当前考虑的物品</param>
-		/// <returns>最大上界</returns>
-		private double GetValueBound(int itemId, BBNode currentNode)
-		{
-			double space = this.Capacity - currentNode.AccWeight;
-			double maxborder = currentNode.AccValue;
-			// 要放入的所有物品应该比当前剩余空间还要小
-			while (itemId < this.ItemTypeCount && this.Items[itemId].Weight <= space)
-			{
-				space -= this.Items[itemId].Weight;
-				maxborder += this.Items[itemId].Value;
-				itemId++;
-			}
-			// 装填剩余容量装满背包
-			if (itemId < this.ItemTypeCount)
-			{
-				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
-			}
-			return maxborder;
-		}
+		private double AnealingRatio = 0.95;
 
 		/// <summary>
-		/// 当前最优解最后一个节点
+		/// 模拟退火内层循环次数
 		/// </summary>
-		private BBNode candidateRouterNode;
+		private int Epoch = 2000;
 
 		/// <summary>
-		/// 当前价值上界
+		/// 随机数产生器
 		/// </summary>
-		private double currentMaxBound;
+		private Random randomer;
 
 		/// <summary>
-		/// 当前最大价值
+		/// 当前最优价值
 		/// </summary>
 		private double currentBestValue;
 
 		/// <summary>
-		/// 物品列表（编号，质量，价值，单位价值）
+		/// 上一改善步骤时的价值
+		/// </summary>
+		private double previousBestValue;
+
+		/// <summary>
+		/// 当前最优解组合
+		/// </summary>
+		private bool[] currentBestRouter;
+
+		/// <summary>
+		/// 上一改善步骤组合
+		/// </summary>
+		private bool[] previousBestRouter;
+
+		/// <summary>
+		/// 当前选中物品的组合
+		/// </summary>
+		private bool[] currentRouter;
+
+		/// <summary>
+		/// 物品列表
 		/// </summary>
 		private List<PackageItem> Items;
-		
+
 		/// <summary>
-		/// 选中列表
+		/// 选中的物品
 		/// </summary>
 		private List<PackageItem> PickList;
 	}

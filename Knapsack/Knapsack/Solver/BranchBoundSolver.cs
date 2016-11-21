@@ -11,7 +11,6 @@ namespace Knapsack
 	/// </summary>
 	class BranchBoundSolver : Solver
 	{
-
 		/// <summary>
 		/// 初始化问题解决器
 		/// </summary>
@@ -71,128 +70,7 @@ namespace Knapsack
 			// 算法结束
 			this.EndTimeStamp = DateTime.Now;
 		}
-		
-		/// <summary>
-		/// 求子树的价值上界
-		/// </summary>
-		/// <param name="itemId">当前考虑的物品</param>
-		/// <returns>最大上界</returns>
-		private double GetMaxBound(int itemId)
-		{
-			double space = this.Capacity - currentWeight;
-			double maxborder = currentValue;
-			// 要放入的所有物品应该比当前剩余空间还要小
-			while (itemId < this.ItemTypeCount && this.Items[itemId].Weight <= space)
-			{
-				space -= this.Items[itemId].Weight;
-				maxborder += this.Items[itemId].Value;
-				itemId++;
-			}
-			// 装填剩余容量装满背包
-			if (itemId < this.ItemTypeCount)
-			{
-				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
-			}
-			return maxborder;
-		}
-		
-		/// <summary>
-		/// 分支界限求最大价值路径
-		/// </summary>
-		/// <returns>能够达到的最大价值</returns>
-		private void BranchAndBound()
-		{
-			int itemId = 0;
-			double currentUpperBound = this.GetMaxBound(itemId);
-			this.heapQueue = new PriorityQueue<BBNode>();
-			BBNode currentExpandNode = null;
-			// 分支界限搜索
-			while (true)
-			{
-				// 左子树（放入）可以拓展
-				double LeftWeight = this.currentWeight + this.Items[itemId].Weight;
-				if (LeftWeight <= this.Capacity)         
-				{
-					if (this.currentValue + this.Items[itemId].Value > this.currentBestValue)
-					{
-						this.currentBestValue = this.currentValue + this.Items[itemId].Value;
-						this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-							this.currentValue + this.Items[itemId].Value, this.currentWeight + this.Items[itemId].Weight,
-							itemId + 1, true, currentExpandNode);
-					}
-					else
-					{
-						this.InsertToHeap(currentUpperBound, this.currentValue + this.Items[itemId].Value,
-						this.currentWeight + this.Items[itemId].Weight, itemId + 1, true, currentExpandNode);
-					}
-				}
-				currentUpperBound = this.GetMaxBound(itemId + 1);
-				// 右子树的价值上界比当前最大值还大才有拓展的意义
-				if (currentUpperBound >= this.currentBestValue)
-				{
-					this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
-						this.currentValue, this.currentWeight, itemId + 1, false, currentExpandNode);
-				}
-				// 所有节点都已经展开就返回
-				if (this.heapQueue.Empty())
-				{
-					return;
-				}
-				// 取下一个要生长的节点
-				currentExpandNode = this.heapQueue.Top();
-				this.heapQueue.Pop();
-				this.currentWeight = currentExpandNode.AccWeight;
-				this.currentValue = currentExpandNode.AccValue;
-				currentUpperBound = currentExpandNode.ValueUpperBound;
-				itemId = currentExpandNode.Level;
-			}
-		}
 
-		/// <summary>
-		/// 将一个新的活结点插入到子集树和最大堆heap中
-		/// </summary>
-		/// <param name="maxValue">价值上界</param>
-		/// <param name="accValue">节点累积价值</param>
-		/// <param name="accWeight">节点累积质量</param>
-		/// <param name="level">节点层次</param>
-		/// <param name="pickFlag">是否挑选当前物品</param>
-		/// <param name="parent">上层节点</param>
-		/// <returns>加入的节点</returns>
-		private BBNode InsertToHeap(double maxValue, double accValue, double accWeight, int level, bool pickFlag, BBNode parent)
-		{
-			BBNode node = new BBNode(level, null);
-			node.ValueUpperBound = maxValue;
-			node.AccValue = accValue;
-			node.AccWeight = accWeight;
-			node.Pick = pickFlag;
-			node.Parent = parent;
-			if (level <= this.ItemTypeCount)
-			{
-				this.heapQueue.Push(node);
-			}
-			return node;
-		}
-
-		/// <summary>
-		/// 反向计算到达最优值的路径
-		/// </summary>
-		private void GetSolutionRouter()
-		{
-			this.PickList = new List<PackageItem>();
-			var iterNode = this.CandidateRouterDestination;
-			this.FinalWeight = 0;
-			while (iterNode != null)
-			{
-				if (iterNode.Pick == true && iterNode.Level < this.ItemTypeCount)
-				{
-					var picker = this.Items[iterNode.Level - 1];
-                    this.PickList.Add(picker);
-					this.FinalWeight += picker.Weight;
-                }
-				iterNode = iterNode.Parent;
-			}
-		}
-		
 		/// <summary>
 		/// 获取问题解决的结果
 		/// </summary>
@@ -274,7 +152,128 @@ namespace Knapsack
 		{
 			costTime = (this.EndTimeStamp - this.BeginTimeStamp).TotalMilliseconds;
 		}
-		
+
+		/// <summary>
+		/// 求子树的价值上界
+		/// </summary>
+		/// <param name="itemId">当前考虑的物品</param>
+		/// <returns>最大上界</returns>
+		private double GetMaxBound(int itemId)
+		{
+			double space = this.Capacity - currentWeight;
+			double maxborder = currentValue;
+			// 要放入的所有物品应该比当前剩余空间还要小
+			while (itemId < this.ItemTypeCount && this.Items[itemId].Weight <= space)
+			{
+				space -= this.Items[itemId].Weight;
+				maxborder += this.Items[itemId].Value;
+				itemId++;
+			}
+			// 装填剩余容量装满背包
+			if (itemId < this.ItemTypeCount)
+			{
+				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
+			}
+			return maxborder;
+		}
+
+		/// <summary>
+		/// 分支界限求最大价值路径
+		/// </summary>
+		/// <returns>能够达到的最大价值</returns>
+		private void BranchAndBound()
+		{
+			int itemId = 0;
+			double currentUpperBound = this.GetMaxBound(itemId);
+			this.heapQueue = new PriorityQueue<BBNode>();
+			BBNode currentExpandNode = null;
+			// 分支界限搜索
+			while (true)
+			{
+				// 左子树（放入）可以拓展
+				double LeftWeight = this.currentWeight + this.Items[itemId].Weight;
+				if (LeftWeight <= this.Capacity)
+				{
+					if (this.currentValue + this.Items[itemId].Value > this.currentBestValue)
+					{
+						this.currentBestValue = this.currentValue + this.Items[itemId].Value;
+						this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
+							this.currentValue + this.Items[itemId].Value, this.currentWeight + this.Items[itemId].Weight,
+							itemId + 1, true, currentExpandNode);
+					}
+					else
+					{
+						this.InsertToHeap(currentUpperBound, this.currentValue + this.Items[itemId].Value,
+						this.currentWeight + this.Items[itemId].Weight, itemId + 1, true, currentExpandNode);
+					}
+				}
+				currentUpperBound = this.GetMaxBound(itemId + 1);
+				// 右子树的价值上界比当前最大值还大才有拓展的意义
+				if (currentUpperBound >= this.currentBestValue)
+				{
+					this.CandidateRouterDestination = this.InsertToHeap(currentUpperBound,
+						this.currentValue, this.currentWeight, itemId + 1, false, currentExpandNode);
+				}
+				// 所有节点都已经展开就返回
+				if (this.heapQueue.Empty())
+				{
+					return;
+				}
+				// 取下一个要生长的节点
+				currentExpandNode = this.heapQueue.Top();
+				this.heapQueue.Pop();
+				this.currentWeight = currentExpandNode.AccWeight;
+				this.currentValue = currentExpandNode.AccValue;
+				currentUpperBound = currentExpandNode.ValueUpperBound;
+				itemId = currentExpandNode.Level;
+			}
+		}
+
+		/// <summary>
+		/// 将一个新的活结点插入到子集树和最大堆heap中
+		/// </summary>
+		/// <param name="maxValue">价值上界</param>
+		/// <param name="accValue">节点累积价值</param>
+		/// <param name="accWeight">节点累积质量</param>
+		/// <param name="level">节点层次</param>
+		/// <param name="pickFlag">是否挑选当前物品</param>
+		/// <param name="parent">上层节点</param>
+		/// <returns>加入的节点</returns>
+		private BBNode InsertToHeap(double maxValue, double accValue, double accWeight, int level, bool pickFlag, BBNode parent)
+		{
+			BBNode node = new BBNode(level, null);
+			node.ValueUpperBound = maxValue;
+			node.AccValue = accValue;
+			node.AccWeight = accWeight;
+			node.Pick = pickFlag;
+			node.Parent = parent;
+			if (level <= this.ItemTypeCount)
+			{
+				this.heapQueue.Push(node);
+			}
+			return node;
+		}
+
+		/// <summary>
+		/// 反向计算到达最优值的路径
+		/// </summary>
+		private void GetSolutionRouter()
+		{
+			this.PickList = new List<PackageItem>();
+			var iterNode = this.CandidateRouterDestination;
+			this.FinalWeight = 0;
+			while (iterNode != null)
+			{
+				if (iterNode.Pick == true && iterNode.Level < this.ItemTypeCount)
+				{
+					var picker = this.Items[iterNode.Level - 1];
+					this.PickList.Add(picker);
+					this.FinalWeight += picker.Weight;
+				}
+				iterNode = iterNode.Parent;
+			}
+		}
+
 		/// <summary>
 		/// 当前背包重量
 		/// </summary>

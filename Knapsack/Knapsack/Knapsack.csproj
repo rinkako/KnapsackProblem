@@ -43,15 +43,16 @@
   <ItemGroup>
     <Compile Include="Base\MaxHeap.cs" />
     <Compile Include="Base\PriorityQueue.cs" />
+    <Compile Include="Solver\SimulatedAnnealingSolver.cs" />
     <Compile Include="Solver\BackTraceSolver.cs" />
     <Compile Include="Base\BBNode.cs" />
     <Compile Include="Solver\BranchBoundSolver.cs" />
     <Compile Include="Solver\DynamicPlanSolver.cs" />
-    <Compile Include="Form\Form1.cs">
+    <Compile Include="Form\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Form\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Solver\GreedySolver.cs" />
     <Compile Include="Base\PackageItem.cs" />
@@ -65,8 +66,8 @@
     <Compile Include="Solver\ProblemGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form\Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Form\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form\PreviewForm.resx">
       <DependentUpon>PreviewForm.cs</DependentUpon>
