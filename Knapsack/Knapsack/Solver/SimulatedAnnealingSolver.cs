@@ -70,131 +70,6 @@ namespace Knapsack
 			// 算法结束
 			this.EndTimeStamp = DateTime.Now;
 		}
-
-		/// <summary>
-		/// 模拟退火搜索最优解
-		/// </summary>
-		private void SimulatedAnealing()
-		{
-			// 升温
-			double currentTemperature = this.BeginTemperature;
-			// 模拟退火
-			while (currentTemperature > this.EndTemperature)
-			{
-				// 恒温搜索
-				for (int i = 0; i < this.Epoch; i++)
-				{
-					// 扰动产生解
-					int cid1 = 0, cid2 = 0;
-					while (cid1 == cid2)
-					{
-						cid1 = this.randomer.Next(0, this.ItemTypeCount);
-						cid2 = this.randomer.Next(0, this.ItemTypeCount);
-					}
-					this.currentRouter[cid1] = true;
-					this.currentRouter[cid2] = true;
-					if (this.GetCurrentWeight() > this.Capacity)
-					{
-						this.currentRouter[cid2] = false;
-					}
-					if (this.GetCurrentWeight() > this.Capacity)
-					{
-						this.currentRouter[cid1] = false;
-					}
-					// 计算增量
-					double currentValue = this.GetValue(this.currentRouter);
-                    double delta = currentValue - this.currentBestValue;
-					// 如果情况改善了局部最优值就直接接受她
-					if (delta > 0)
-					{
-						Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
-						Array.Copy(this.currentRouter, this.currentBestRouter, this.ItemTypeCount);
-						this.previousBestValue = this.currentBestValue = currentValue;
-                    }
-					// 否则需要进一步计算
-					else
-					{
-						delta = currentValue - this.previousBestValue;
-						// 如果能够改善上一次移动，就接受她
-						if (delta > 0)
-						{
-							Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
-							this.previousBestValue = currentValue;
-						}
-						// 否则她是一次没有正面作用的移动，那么只能以一定概率接受她
-						else
-						{
-							// 随机移动
-							double acceptCoin = this.randomer.Next(0, Int32.MaxValue) % 20001 / 20000.0;
-							// 落在接受域
-							if (Math.Exp(delta / currentTemperature) > acceptCoin)
-							{
-								Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
-								this.previousBestValue = currentValue;
-							}
-							// 落在拒绝域，回滚本次改变
-							else
-							{
-								Array.Copy(this.previousBestRouter, this.currentRouter, this.ItemTypeCount);
-							}
-						}
-					}
-				}
-				// 降温
-				currentTemperature *= this.AnealingRatio;
-			}
-		}
-		
-		/// <summary>
-		/// 反向计算到达最优值的组合
-		/// </summary>
-		private void GetSolutionRouter()
-		{
-			this.PickList = new List<PackageItem>();
-			for (int i = 0; i < this.ItemTypeCount; i++)
-			{
-				if (this.currentBestRouter[i])
-				{
-					this.PickList.Add(this.Items[i]);
-					this.FinalWeight += this.Items[i].Weight;
-				}
-			}
-		}
-
-		/// <summary>
-		/// 获取当前总质量
-		/// </summary>
-		/// <returns>当前背包总质量</returns>
-		private double GetCurrentWeight()
-		{
-			double acc = 0;
-			for (int i = 0; i < this.currentRouter.Length; i++)
-			{
-				if (this.currentRouter[i])
-				{
-					acc += this.Items[i].Weight;
-				}
-			}
-			return acc;
-		}
-
-		/// <summary>
-		/// 获取当前总价值
-		/// </summary>
-		/// <param name="pickVec">物品选中情况描述向量</param>
-		/// <returns>当前背包总价值</returns>
-		private double GetValue(bool[] pickVec)
-		{
-			double acc = 0;
-			for (int i = 0; i < pickVec.Length; i++)
-			{
-				if (pickVec[i])
-				{
-					acc += this.Items[i].Value;
-				}
-			}
-			return acc;
-		}
 		
 		/// <summary>
 		/// 获取问题解决的结果
@@ -276,6 +151,131 @@ namespace Knapsack
 		public override void GetCost(out double costTime)
 		{
 			costTime = (this.EndTimeStamp - this.BeginTimeStamp).TotalMilliseconds;
+		}
+
+		/// <summary>
+		/// 模拟退火搜索最优解
+		/// </summary>
+		private void SimulatedAnealing()
+		{
+			// 升温
+			double currentTemperature = this.BeginTemperature;
+			// 模拟退火
+			while (currentTemperature > this.EndTemperature)
+			{
+				// 恒温搜索
+				for (int i = 0; i < this.Epoch; i++)
+				{
+					// 扰动产生解
+					int cid1 = 0, cid2 = 0;
+					while (cid1 == cid2)
+					{
+						cid1 = this.randomer.Next(0, this.ItemTypeCount);
+						cid2 = this.randomer.Next(0, this.ItemTypeCount);
+					}
+					this.currentRouter[cid1] = true;
+					this.currentRouter[cid2] = true;
+					if (this.GetCurrentWeight() > this.Capacity)
+					{
+						this.currentRouter[cid2] = false;
+					}
+					if (this.GetCurrentWeight() > this.Capacity)
+					{
+						this.currentRouter[cid1] = false;
+					}
+					// 计算增量
+					double currentValue = this.GetValue(this.currentRouter);
+					double delta = currentValue - this.currentBestValue;
+					// 如果情况改善了局部最优值就直接接受她
+					if (delta > 0)
+					{
+						Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+						Array.Copy(this.currentRouter, this.currentBestRouter, this.ItemTypeCount);
+						this.previousBestValue = this.currentBestValue = currentValue;
+					}
+					// 否则需要进一步计算
+					else
+					{
+						delta = currentValue - this.previousBestValue;
+						// 如果能够改善上一次移动，就接受她
+						if (delta > 0)
+						{
+							Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+							this.previousBestValue = currentValue;
+						}
+						// 否则她是一次没有正面作用的移动，那么只能以一定概率接受她
+						else
+						{
+							// 随机移动
+							double acceptCoin = this.randomer.Next(0, Int32.MaxValue) % 20001 / 20000.0;
+							// 落在接受域
+							if (Math.Exp(delta / currentTemperature) > acceptCoin)
+							{
+								Array.Copy(this.currentRouter, this.previousBestRouter, this.ItemTypeCount);
+								this.previousBestValue = currentValue;
+							}
+							// 落在拒绝域，回滚本次改变
+							else
+							{
+								Array.Copy(this.previousBestRouter, this.currentRouter, this.ItemTypeCount);
+							}
+						}
+					}
+				}
+				// 降温
+				currentTemperature *= this.AnealingRatio;
+			}
+		}
+
+		/// <summary>
+		/// 反向计算到达最优值的组合
+		/// </summary>
+		private void GetSolutionRouter()
+		{
+			this.PickList = new List<PackageItem>();
+			for (int i = 0; i < this.ItemTypeCount; i++)
+			{
+				if (this.currentBestRouter[i])
+				{
+					this.PickList.Add(this.Items[i]);
+					this.FinalWeight += this.Items[i].Weight;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 获取当前总质量
+		/// </summary>
+		/// <returns>当前背包总质量</returns>
+		private double GetCurrentWeight()
+		{
+			double acc = 0;
+			for (int i = 0; i < this.currentRouter.Length; i++)
+			{
+				if (this.currentRouter[i])
+				{
+					acc += this.Items[i].Weight;
+				}
+			}
+			return acc;
+		}
+
+		/// <summary>
+		/// 获取当前总价值
+		/// </summary>
+		/// <param name="pickVec">物品选中情况描述向量</param>
+		/// <returns>当前背包总价值</returns>
+		private double GetValue(bool[] pickVec)
+		{
+			double acc = 0;
+			for (int i = 0; i < pickVec.Length; i++)
+			{
+				if (pickVec[i])
+				{
+					acc += this.Items[i].Value;
+				}
+			}
+			return acc;
 		}
 
 		/// <summary>
