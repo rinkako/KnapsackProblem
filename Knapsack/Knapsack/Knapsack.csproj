@@ -47,7 +47,7 @@
     <Compile Include="Solver\BackTraceSolver.cs" />
     <Compile Include="Base\BBNode.cs" />
     <Compile Include="Solver\BranchBoundSolver.cs" />
-    <Compile Include="Solver\DynamicPlanSolver.cs" />
+    <Compile Include="Solver\DynamicProgramSolver.cs" />
     <Compile Include="Form\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

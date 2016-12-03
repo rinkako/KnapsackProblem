@@ -170,7 +170,7 @@ namespace Knapsack
         /// </summary>
         private void button5_Click(object sender, EventArgs e)
         {
-			this.CallSolver(new DynamicPlanSolver(), "动态规划");
+			this.CallSolver(new DynamicProgramSolver(), "动态规划");
 		}
 
 		/// <summary>

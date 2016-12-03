@@ -9,7 +9,7 @@ namespace Knapsack
     /// <summary>
     /// 动态规划的问题解决器
     /// </summary>
-    class DynamicPlanSolver : Solver
+    class DynamicProgramSolver : Solver
     {
         /// <summary>
         /// 初始化问题解决器
@@ -49,7 +49,7 @@ namespace Knapsack
                 this.Items.Add(new PackageItem((i - 2).ToString(), aW, aV));
             }
             // 动态规划
-            this.PickList = this.DynamicPlanning();
+            this.PickList = this.DynamicProgram();
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Knapsack
         /// 执行具体的动态规划算法
         /// </summary>
         /// <returns>物品的Pick向量</returns>
-        private List<PackageItem> DynamicPlanning()
+        private List<PackageItem> DynamicProgram()
         {
             this.DPTable = new int[this.ItemTypeCount, this.Capacity + 1];
             for (var j = 0; j <= this.Capacity; j++)

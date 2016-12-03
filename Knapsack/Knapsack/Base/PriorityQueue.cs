@@ -114,6 +114,6 @@ namespace Knapsack
 		/// <summary>
 		/// 堆的原始尺寸
 		/// </summary>
-		private const int defaultCapacity = 256;
+		private const int defaultCapacity = 1024;
 	}
 }
