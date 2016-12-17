@@ -172,7 +172,7 @@ namespace Knapsack
 			// 装填剩余容量装满背包
 			if (itemId < this.ItemTypeCount)
 			{
-				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
+				maxborder += ((double)this.Items[itemId].Value / (double)this.Items[itemId].Weight) * space;
 			}
 			return maxborder;
 		}

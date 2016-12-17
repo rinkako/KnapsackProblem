@@ -157,47 +157,41 @@ namespace Knapsack
 		/// <param name="parent">搜索树上层节点</param>
 		private void BackTrace(int depth, BBNode parent)
 		{
-			// 递归边界
-			if (depth >= this.ItemTypeCount)
-			{
-				// 优于局部最小值时替换她
-				if (this.candidateRouterNode == null ||
-					parent.AccValue > this.candidateRouterNode.AccValue)
-				{
-					this.candidateRouterNode = parent;
-				}
-				return;
-			}
-			// 计算价值上界
-			this.currentMaxBound = this.GetValueBound(depth, parent);
-			// 如果下一物体可以放入就尝试放入
-			if (parent.AccWeight + this.Items[depth].Weight <= this.Capacity)
-			{
-				// 放入
-				BBNode leftNode = new BBNode(depth, parent);
-				leftNode.Pick = true;
-				leftNode.AccValue = parent.AccValue + this.Items[depth].Value;
-				leftNode.AccWeight = parent.AccWeight + this.Items[depth].Weight;
-				leftNode.ValueUpperBound = this.currentMaxBound;
-				// 更新最大价值
-				if (this.currentBestValue < leftNode.AccValue)
-				{
-					this.currentBestValue = leftNode.AccValue;
-				}
-				// 递归
-				this.BackTrace(depth + 1, leftNode);
-			}
-			// 不放入当前物品的情况
-			this.currentMaxBound = this.GetValueBound(depth + 1, parent);
-			if (this.currentMaxBound >= this.currentBestValue)
-			{
-				BBNode rightNode = new BBNode(depth, parent);
-				rightNode.AccValue = parent.AccValue;
-				rightNode.AccWeight = parent.AccWeight;
-				rightNode.ValueUpperBound = this.currentMaxBound;
-				this.BackTrace(depth + 1, rightNode);
-			}
-		}
+            // 递归边界
+            if (depth >= this.ItemTypeCount)
+            {
+                // 优于局部最小值时替换她
+                if (this.candidateRouterNode == null ||
+                    parent.AccValue > this.candidateRouterNode.AccValue)
+                {
+                    this.currentBestValue = parent.AccValue;
+                    this.candidateRouterNode = parent;
+                }
+                return;
+            }
+            // 计算价值上界
+            this.currentMaxBound = this.GetValueBound(depth, parent);
+            // 如果下一物体可以放入就尝试放入
+            if (parent.AccWeight + this.Items[depth].Weight <= this.Capacity)
+            {
+                // 放入
+                BBNode leftNode = new BBNode(depth, parent);
+                leftNode.Pick = true;
+                leftNode.AccValue = parent.AccValue + this.Items[depth].Value;
+                leftNode.AccWeight = parent.AccWeight + this.Items[depth].Weight;
+                // 递归
+                this.BackTrace(depth + 1, leftNode);
+            }
+            // 不放入当前物品的情况
+            this.currentMaxBound = this.GetValueBound(depth + 1, parent);
+            if (this.currentMaxBound >= this.currentBestValue)
+            {
+                BBNode rightNode = new BBNode(depth, parent);
+                rightNode.AccValue = parent.AccValue;
+                rightNode.AccWeight = parent.AccWeight;
+                this.BackTrace(depth + 1, rightNode);
+            }
+        }
 
 		/// <summary>
 		/// 反向计算到达最优值的路径
@@ -238,7 +232,7 @@ namespace Knapsack
 			// 装填剩余容量装满背包
 			if (itemId < this.ItemTypeCount)
 			{
-				maxborder += (this.Items[itemId].Value / this.Items[itemId].Weight) * space;
+				maxborder += ((double)this.Items[itemId].Value / (double)this.Items[itemId].Weight) * space;
 			}
 			return maxborder;
 		}
